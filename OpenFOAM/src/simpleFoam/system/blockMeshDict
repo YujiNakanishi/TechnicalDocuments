@@ -1,0 +1,85 @@
+FoamFile
+{
+	version	2.0;
+	format	ascii;
+	class	dictionary;
+	object	blockMeshDict;
+}
+
+minx	-10;
+maxx	40;
+miny	-10;
+maxy	10;
+minz	-0.3;
+maxz	0.3;
+
+xm		(0 3 4 7);
+xp		(1 2 6 5);
+ym		(0 1 4 5);
+yp		(2 3 6 7);
+zm		(0 3 2 1);
+zp		(4 5 6 7);
+
+
+scale	1; 
+
+vertices
+(
+	($minx $miny $minz)
+	($maxx $miny $minz)
+	($maxx $maxy $minz)
+	($minx $maxy $minz)
+	($minx $miny $maxz)
+	($maxx $miny $maxz)
+	($maxx $maxy $maxz)
+	($minx $maxy $maxz)
+	
+);
+
+blocks
+(
+	hex (0 1 2 3 4 5 6 7) (250 100 1) simpleGrading (1 1 1)
+);
+
+
+boundary
+(
+	inlet
+	{
+		type	patch;
+		faces
+		(
+			$xm
+		);
+	}
+	outlet
+	{
+		type	patch;
+		faces
+		(
+			$xp
+		);
+	}
+	wall
+	{
+		type	wall;
+		faces
+		(
+			$ym
+			$yp
+		);
+	}
+
+	no_dim
+	{
+		type empty;
+		faces
+		(
+			$zm
+			$zp
+		);
+	}
+);
+
+mergePatchPairs
+();

@@ -1,0 +1,430 @@
+\documentclass[dvipdfmx, 9pt, a4paper]{jsarticle}
+\usepackage[margin=15mm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{amsmath,  amssymb}
+\usepackage{type1cm}
+\usepackage{latexsym}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{ascmac}
+\usepackage{listings,jvlisting}
+\usepackage{tcolorbox}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+\renewcommand{\thefigure}{\arabic{section}.\arabic{figure}}
+\renewcommand{\thetable}{\arabic{section}.\arabic{table}}
+\makeatletter
+\@addtoreset{equation}{section}
+\@addtoreset{figure}{section}
+\@addtoreset{table}{section}
+\AtBeginDocument{
+  \renewcommand*{\thelstlisting}{\arabic{section}.\arabic{lstlisting}}%
+  \@addtoreset{lstlisting}{section}
+}
+
+
+\numberwithin{equation}{section}
+
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{9}
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{9}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+\renewcommand{\baselinestretch}{0.78}
+\newcommand{\bm}[1]{{\mbox{\boldmath $#1$}}}
+\newtheorem{Proof}{証明}
+\def\qed{\hfill $\Box$}
+
+\newcommand\pythonstyle{\lstset{
+language=Python,
+basicstyle=\ttm,
+morekeywords={self},
+keywordstyle=\ttb\color{deepblue},
+emph={MyClass,__init__},
+emphstyle=\ttb\color{deepred},
+stringstyle=\color{deepgreen},
+frame=tb,
+showstringspaces=false
+}}
+
+\lstnewenvironment{python}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+
+\newcommand\pythonexternal[2][]{{
+\pythonstyle
+\lstinputlisting[#1]{#2}}}
+\newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
+
+
+\begin{document}
+\begin{center}
+{\fontsize{18pt}{1pt}\selectfont 連続体力学}\\
+\end{center}
+\section*{はじめに}
+ニュートンの運動方程式は質点に対して言及した法則であった。従って物体の移動は考慮していても、自転を考えることはできない。私たちがよく目にする物体の自転は、「物体が多数の質点で構成されており、それぞれがある点を中心として公転する」と解釈する。ただしこの質点の数はアボガドロ数のオーダーだけあるので、一つ一つの運動を求めることは計算コストの面などで不可能と言える。そんな中で連続体力学という学問が誕生した。\par
+物体の平均自由行程が非常に小さい場合、近傍粒子同士が多数の衝突を繰り返すため、局所的な平衡状態が生まれる。つまり統計力学のようなマクロな視点を局所領域に持ち込める訳である。局所的平衡になっている多数の質点で構成された部分系を考えよう。部分系の空間的領域が小さい場合、系に含まれる質点の数は減るため、統計力学的解釈の妥当性は損なわれていく。ただし、連続体力学では限りなく微小な部分系であってもマクロな視点を持ち込めると仮定する。これは限りなく小さな領域内にも多数の質点が存在することに相当する。それゆえ連続体力学と呼ばれている訳である。\par
+部分系として以下の2つの考え方がある。
+\begin{itemize}
+\item ある時刻の物体に対して同じ状態にある質点群を纏めた部分系。これを物質粒子もしくは単に粒子と呼ぶ。運動中の粒子は近傍の別の粒子と相互作用する。したがって同じ作用を受けることになる粒子内の質点は、その後も運動を共にする。つまり、運動中に他の質点が流入することはない訳である。それゆえこの粒子は閉じた系と言える。
+\item 空間を非常に細かく分割し、それぞれに対し部分系を考える。部分系内の質点は密集しているため、この部分系も局所的に平衡状態にあると考えられるし、マクロな物理量を扱うことができる。部分系の状態変化は質点自体の状態変化、もしくは質点の流入出によって起こる。従ってこの部分系は開いた系だと言える。
+\end{itemize}
+前者のような考え方をラグランジアン形式と言い、後者をオイラー形式な考え方と言う。当然ながら互いの描像は一対一に対応するので、どちらの形式を採用しても構わない(構造力学の分野ではラグランジュ形式を採用し、流体力学の分野ではオイラー形式を採用することが多い)。本資料では慣習に従いラグランジュ形式で連続体力学を議論することにした。もちろんラグランジュ形式からオイラー形式への変換についても紹介するので、最終的にオイラー形式による定式化も学ぶことができるよう配慮した。\par
+さて、世の物質が固体や流体と分類されている所以は、応力の特性に違いがあるためである。例えば弾性体はひずみが生じたときに応力を受け、流体はひずみ量が時間変化したときに応力を受ける。物体の変位は回転と変形に分解できるが、ここで言うひずみは変形と密接に関係する。後述するようにひずみや応力の表現には2階テンソルが用いられる。ひずみやひずみ速度に関するテンソルから応力テンソルを導き出すモデルのことを構成方程式と言い、物質を特徴づける非常に重要な式である。しかしながら、本資料では構成方程式まで踏み込まない。あくまでひずみや応力のテンソルの概念の紹介に留め、構成方程式なる物理モデルの紹介は流体力学や固体力学などの資料で扱うことにした。\par
+さて、先程応力やひずみという言葉を用いたが、本資料ではこれらについて厳密に議論していく。始めの1章では内力、特にコーシー応力について議論する。2章では物体の運動について議論し、現在配置と基準配置という連続体力学において非常に重要な概念を学ぶ。3章では連続体力学における支配方程式を学び、最後の4章では基準配置でみたときの支配方程式について考えていく。
+
+\section{コーシー応力}
+力学において扱う力には内力と外力の二種類があった。このうち内力は質点間に働く力であるが、多くの質点を含む部分系を基に考えた場合、この内力により部分系間で運動量の流入出が生じる。単位面積当たりに流出する運動量、つまり単位面積辺りに働く力のことを{\bf コーシー応力}という(連続体力学では様々な応力の定義が存在する。しかしながら、一般的に応力と言えばコーシー応力のことであるため、本資料でも誤解を招かない限りコーシー応力のことを応力と略記する)。\par
+連続体力学では物体中の任意の点で物質が存在すると考えるので、応力も物体中の任意の点で定められる。しかしながら、物体という全体系を部分系に分割する方法は任意であるため、部分系間の境界の定め方も任意である。そのため、ある点を指定されてもそこでの応力を求めることはできない。その点を通る断面の向きは任意であり、向きによって点$P$での応力も変わるためである。例えば丸棒の引張試験について考えよう。丸棒内の任意の点に対して断面と並行な境界面を考えたとき、その境界では引張応力による運動量輸送が確認できる。一方で断面と垂直な境界面を考えたとき、その境界では運動量輸送が確認されない。\par
+したがって応力を求めるためには、位置座標だけでなく境界面の情報も必要になってくる。具体的に境界面の情報とは、境界面に対して垂直な単位法線ベクトルである。ただし、法線ベクトルの向きは考えている部分系に対して外向きとする。\par
+そして、応力はコーシー応力テンソル$\bm \sigma \in \mathbb{R}^{3 \times 3}$より求められる(以後誤解を招かない限り応力テンソルと略記)。ここで応力テンソルは2階テンソルであり、3次元の法線ベクトルを入力とし、3次元の応力ベクトルを出力する(この3次元は3次元空間を考えていることに由来する)。つまり、ある点における法線ベクトルが$\bm n$であるとき、そこに働く応力$\bm t$は、
+\begin{equation}
+\bm t=\bm \sigma \bm n
+\end{equation}
+より求まる。なお、一般的に2テンソルに対してはボールド体を用いないが、連続体力学の分野ではよく用いる。本資料でもその慣習に従った。\par
+応力テンソルは部分系の状態や物性値に依存する。依存の様は構成則と呼ばれており、固体か流体か、更には弾性体か塑性体か等によって大きく異なる。本資料では構成則について触れないため抽象的な議論になってしまっているが、その代わり固体や流体などを統一的に議論する術を得られるだろう。\par
+さて、連続体力学では点で表されるような小さな部分系を考え、各部分系の状態変化をニュートンの運動方程式で求める。従って部分系は自転しない。この条件を満たすためには、応力テンソルは対称テンソルでなければならない。\par
+次に応力テンソルの表現行列を考える。例として基底に$\{\bm e_1, \bm e_2, \bm e_3\}$を採用したとき、$\bm \sigma$の表現行列が
+\begin{equation}
+\bm \sigma = 
+\begin{bmatrix}
+\sigma_{11} & \sigma_{12} & \sigma_{13} \\
+\sigma_{21} & \sigma_{22} & \sigma_{23} \\
+\sigma_{31} & \sigma_{32} & \sigma_{33} \\
+\end{bmatrix} \notag
+\end{equation}
+であったとしよう。これに対し、$\bm e_1$が法線ベクトルとなるような境界面を考える。このとき得られる応力は$\bm t=(\sigma_{11}, \sigma_{12}, \sigma_{13})^{\rm T}$となる。同様の計算を試すことで次のことに気付くだろう。つまり、ある基底$\{\bm n_1, \bm n_2, \bm n_3 \}$に対して応力テンソルの表現行列$\bm \sigma$を得たとする。この成分$\sigma_{ij}$は$\bm n_i$に垂直な面に働く応力の$j$方向成分である。したがって応力テンソルの表現行列の対角成分は垂直応力と関係し、それ以外はせん断応力に関係する。
+
+\section{変形の記述}
+ラグランジュ形式で考えた場合、物体は閉じた部分系に分割され、各部分系の運動をもって物体の運動が記述される。当然ながら各部分系は区別されているため、識別するためのラベルが必要となる。連続体力学では、時刻$t=0$での部分系の座標値$\bm X$をラベル代わりに用いる。このような座標$\bm X$を{\bf 物質座標}(もしくはラグランジュ座標)と言う。また、ある物体における全ての部分系の物質座標の集合$B_0$のことを{\bf 現在配置}と言う。\par
+部分系と物質座標は一対一に対応するため、部分系を名指すときに物質座標を用いることができる。そのため、連続体力学では部分系のことを物質点$\bm X$と呼ぶことがある。\par
+各物質点は力を受けることで時々刻々移動し得る。物質点$\bm X$が時刻$t$のときに座標$\bm x$に位置するとした場合、物質点の運動は
+\begin{equation}
+\bm x=\phi(\bm X, t)~~~(\bm X \in B_0)
+\end{equation}
+のように書き表すことができる。この関数$\phi$のことを連続体力学では{\bf 運動}と言う。\par
+位置$\bm x$のことを$\bm X$と区別して{\bf 空間座標}と言う。また、全部分系の空間座標値の集合のことを{\bf 現在配置}と言う。空間座標と物質座標を数ベクトルで表す場合、一般的に同じ基底を採用する。しかしながらこれは必須の制約ではないため、本資料では物質座標における基底を$\{\bm E_1, \bm E_2, \bm E_3\}$、空間座標における基底を$\{\bm e_1, \bm e_2, \bm e_3\}$として区別することにした。一般的に空間座標の基底は時間に依存させず、固定して考える。したがって物質点の運動は$\bm x$の変化から読み取れる。一方で物質座標$\bm X$は各部分系を識別するためのものだったので、時間変化が認められない。これは、物質座標の基底は時間変化すると解釈することもできる。従って、物質座標の基底と空間座標の基底を統一するということは、時刻$t=0$において両基底が一致させることを述べている。\par
+連続体力学では物質の消滅を考えない。これは、異なる物質点が同時刻に同じ点に位置しないことと同値である。つまり$\phi(\bm X_1, t) \neq \phi(\bm X_2, t)$であるため、時刻$t$において$\bm X$と$\bm x$は一対一に対応し、以下の逆関係が存在する。
+\begin{equation}
+\bm X=\phi^{-1}(\bm x, t)
+\end{equation}
+
+\subsection{物理量の関数表記について}
+連続体力学では位置座標以外にも様々な物理量を議論する。物質点$\bm X$に対する任意の物理量$\Psi$は$\Psi=\Psi(\bm X, t)$なる関数で書き表すことができる。これは物質座標を用いていることから分かるように、ラグランジュ形式による描像と言える。\par
+一方で、時刻$t$において$\bm x$と$\bm X$には一対一の関係があるため、
+\begin{equation}
+\Psi=\Psi(\bm X, t)=\Psi\left(\phi^{-1}(\bm x, t), t\right)=\hat{\Psi}(\bm x, t)
+\end{equation}
+を満たすような関数$\hat{\Psi}$が存在する。この関数は空間座標に対して定義されているため、オイラー形式による描像だと言える。\par
+本資料の冒頭で述べた通り、ラグランジュ形式とオイラー形式には一対一の関係がある。これは式(2.2)が成立するためである。ラグランジュ形式からオイラー形式へと変換したい場合は式(2.3)を参考にすればよい。\par
+ラグランジュ形式は$\bm X$を基にして考えるため、ニュートンの運動法則のように物理的意味が捉えやすい。関数の空間変数の定義域が常に$B_0$であることもメリットと言える。一方で変形後の物体に対する物理量分布を考える場合、物理量が$\bm x$に対して定義されているオイラー形式の方が扱いやすいだろう。物理量に対してどちらの形式を利用するかは、その物理量の本来の定義に従って決めなければならない。\par
+物理的な意味を考えたとき、物理量を$\bm p=p_i\bm e_i$や$\bm w=w_{ij}(\bm e_i \otimes \bm e_j)$のように表した方が適切な場合、これを{\bf 現在配置を参照する物理量}と言う(現在配置の意味については後述する)。例えばコーシー応力は物体の運動に寄与する物理量なので、現在配置を参照する物理量に分類される(つまり$\bm t=t_i\bm e_i$として表される物理量である)。また、コーシー応力テンソルも変形後の部分系間の境界の法線ベクトルを入力とするので、現在配置を参照する物理量と言える($\bm \sigma=\sigma_{ij}(\bm e_i \otimes \bm e_j)$として表される物理量である)。\par
+一方で$\bm P=P_i \bm E_i$や$W=W_{ij}(\bm E_i \otimes \bm E_j)$のように、物質座標の基底を用いて表した物理量のことを{\bf 基準配置を参照する物理量}と言う(基準配置の意味については後述する)。連続体力学で扱う物理量の中で、基準配置を参照した方が妥当なものはほとんど無い。しかしながら前述の通り基準配置を参照すれば関数の定義域が常に$B_0$となるため、物理量の空間積分がしやすいというメリットがある。そのため本来ならば現在配置を参照すべき物理量であっても、無理矢理基準配置を参照する形に変換することもある。\par
+また、$Y=Y_{ij}(\bm e_i \otimes \bm E_j)$や$Z=Z_{ij}(\bm E_i \otimes \bm e_j)$のように表される物理量も存在する。連続体力学ではこのようなテンソルを{\bf ツーポイントテンソル}と呼ぶ。例えば基準配置を参照する物理量$\bm P=P_i\bm E_i$に$Y$を作用させた場合、
+\begin{equation}
+Y\bm P=\{Y_{iJ}(\bm e_i \otimes \bm E_J) P_K\bm E_K \}=Y_{iJ}P_K(\bm E_J \cdot \bm E_J)\bm e_i=Y_{iJ}P_J\bm e_i \notag
+\end{equation}
+のように、結果は現在配置を参照する物理量となる。
+
+\subsubsection{変位、速度、加速度}
+物理量の関数表記の例として、変位と速度、並びに加速度を考えていく。ところで物体の運動や後述する変形は運動前後の状態変化の相対量によって決まる。例えばある物質点の変位は、その物質点の運動前後の位置座標の相対量を求めることに他ならない。\par
+運動後の状態は現在配置によって定められる。一方で運動前の状態を定める配置は任意である。多くの場合、運動前の状態の配置は基準配置で定めるが、時刻$t$に対して$t-\Delta t$における配置を用いることもある。このような、運動前の状態を定める配置のことを{\bf 参照配置}と言う。現在配置や基準配置と同様に、参照配置に対しても基底を設けなければならない。そこで、本資料では基準配置を参照配置として用いることにし、参照配置の基底も$\{\bm E_1, \bm E_2, \bm E_3\}$であるとする。\par
+変位などは運動$\phi$より求めることができる。式(2.1)より変位は
+\begin{equation}
+\tilde{\bm u}(\bm X, t)=\bm x - \bm X=\phi(\bm X, t) - \bm X
+\end{equation}
+より求めることができる。なお、本項では物質座標を定義域とする物理量にはチルダを付けることにした。空間座標を定義域としたときの変位は、上式より以下のように求まる。
+\begin{equation}
+\bm u(\bm x, t)=\bm x - \phi^{-1}(\bm x, t)
+\end{equation}
+時刻$t$における物質点$\bm X$の速度は
+\begin{equation}
+\tilde{\bm v}(\bm X, t)=\partial_t\phi(\bm X, t)
+\end{equation}
+のように書き表すことができる。同様に、空間座標を定義域とした速度の定義は
+\begin{equation}
+\bm v(\bm x, t)=\partial_t\phi\left(\phi^{-1}(\bm x, t), t\right)
+\end{equation}
+となる。物質点$\bm X$の加速度についても同様に求めることができる。
+\begin{equation}
+\tilde{\bm a}(\bm X, t)=\partial_{tt}\phi(\bm X, t)
+\end{equation}
+\begin{equation}
+\bm a(\bm x, t)=\partial_{tt}\phi\left(\phi^{-1}(\bm x, t), t\right)
+\end{equation}
+なお、変位と速度、並びに加速度は全て現在配置を参照する物理量である。
+
+\subsubsection{物理量の時間変化率}
+次に物理量の時間変化率について考える。まず初めに物質点$\bm X$に対して定義された物理量の関数$\Theta(\bm X, t)$を考える。$\bm X$を固定したときの物理量の時間変化率は、$t$の偏微分により求まる。このような演算操作を{\bf 物質時間微分}と言い、特別に$\partial_t\Theta=D\Theta/Dt$のように表記する。\par
+次に空間座標に対して定義された物理量の関数$\theta(\bm x, t)$について、物質点の物理量の時間変化率を考える。時刻$t$に物質点が$\bm x$に位置していたとし、時刻$t+\Delta$に$\bm x+\Delta \bm x$に位置していたとする。この場合、時間間隔$\Delta t$の間に物理量は$\theta(\bm x, t)$から$\theta(\bm x+\Delta \bm x, t+\Delta t)$だけ変化する。従って、空間座標で定義された関数$\theta$を用いた場合、時間変化率は
+\begin{equation}
+\frac{D\Theta}{Dt}=\frac{\partial \theta}{\partial t}+\frac{\partial \theta}{\partial \bm x}\cdot \frac{\partial \bm x}{\partial t}=\frac{\partial \theta}{\partial t}+\frac{\partial \theta}{\partial \bm x}\cdot \bm v
+\end{equation}
+となる。最右辺の第二項のことを{\bf 移流項}と言い、流体力学では重要になってくる。
+
+\subsection{物体の変形}
+物体の変形は一つの物質点の運動のみから求められない。例えば全ての物質点が同様な変位を行ったとき、物体のどの箇所でも変形は確認できない。物体の変形を知るには、二つの物質点における相対的な位置関係の変化を考える必要がある。\par
+そこで、物質点$\bm X$と$\bm X+\Delta \bm X$を考える。それぞれの物質点は$\phi(\bm X, t)$および$\phi(\bm X+\Delta X, t)$の運動を行うので、時刻$t$における物質点の位置の差$\Delta \bm x$は
+\begin{equation}
+\Delta \bm x=\phi(\bm X+\Delta X, t)-\phi(\bm X, t)=\frac{\partial \phi(\bm X, t)}{\partial \bm X}\Delta \bm X \notag
+\end{equation}
+のように書き表される。なお、$\Delta \bm X$は小さく、テイラー展開の2次以上の項は無視できるとした。\par
+二つの物質点における、相対的な位置の差の時間変化は$\Delta \bm X$と$\Delta \bm x$を比較することにより求められる。$\Delta \bm X$を微小量としたとき、両物理量の間には
+\begin{equation}
+d\bm x=\frac{\partial \phi(\bm X, t)}{\partial \bm X}d\bm X
+\end{equation}
+なる関係が認められる。上式の作用素は$d\bm X$を$d\bm x$に変換しており、$\bm X$近傍で確認できる変形を表していると言える。連続体力学ではこの作用素のことを{\bf 変形勾配テンソル}と言い、一般的に$F$で書き表す。定義より$\phi(\bm X, t)=\bm x$であるため、$F=\partial\bm x/\partial \bm X$と書き表すことができる。したがって変形勾配テンソルの表現行列は
+\begin{equation}
+F=
+\begin{bmatrix}
+\partial x_1/\partial X_1 & \partial x_1/\partial X_2 & \partial x_1/\partial X_3 \\
+\partial x_2/\partial X_1 & \partial x_2/\partial X_2 & \partial x_2/\partial X_3 \\
+\partial x_3/\partial X_1 & \partial x_3/\partial X_2 & \partial x_3/\partial X_3 \\
+\end{bmatrix} \notag
+\end{equation}
+となる。また、$F$は$d\bm X$を$d\bm x$に変換するテンソルであるため、$F=F_{ij}(\bm e_i \otimes \bm E_J)=\partial x_i/\partial X_J(\bm e_i \otimes \bm E_J)$で書き表されるツーポイントテンソルである。\par
+なお、基準配置の基底ベクトル$\bm E_i$は時々刻々変化すると述べたが、変形勾配テンソルで現れる$\bm E_i$は変形前のものであることに注意してほしい。これは変形前後の位置の差の変化を表すという物理的意味からも分かるであろう。また、一般的には現在配置と基準配置の基底を統一するので、$\bm e_i \otimes \bm E_J$の計算において座標変換をする必要はない。
+\subsubsection{変形による局所的な体積変化と面積変化}
+後述するように、連続体力学では弱形式で支配方程式を書き表すことがある。このとき、支配方程式中に現在配置における体積積分と面積分が現れることになるが、時々刻々変化する現在配置だと積分領域として扱いにくい。そのため基準配置と現在配置間での積分変数の変換を知ることは重要である。\par
+空間積分における積分変数の変換のためには、物質点が占める領域の変化、つまり変形による局所的な体積変化を知る必要がある。そこで$\bm X$近傍の微小体積$dV$を考える。この微小領域は三つの微分ベクトル$d\bm X_1, d\bm X_2, d\bm X_3$によって構成されているとすると、$dV=|d\bm X_1. d\bm X_2, d\bm X_3|$となる。ここで$|\cdot|$はスカラー3重積である。この微小領域内にある物質点が、運動の末に位置$\bm x$および体積$dv$の微小領域に収まったとする。微小領域が三つの微分ベクトル$d\bm x_1, d\bm x_2, d\bm x_3$で構成されているとしたとき、定義より$d\bm x_i=dF\bm X_i$なる関係がある。従って$dv=|Fd\bm X_1. Fd\bm X_2, Fd\bm X_3|$と求まるので、変形による体積変化は
+\begin{equation}
+dv={\rm det}FdV=JdV
+\end{equation}
+となる。$J={\rm det}F=dv/dV$は局所的な体積変化率を表しており、連続体力学では{\bf ヤコビアン}と呼ぶ。変形をしても物体中で体積が消えることはないので、常に$J>0$でなければならない。従って変形勾配テンソルは正則だと言える。\par
+次に、面積分における積分変数の変換には、微小面積と法線ベクトルの変化を知る必要がある。二つの微小ベクトル$d\bm X_1$と$d\bm X_2$によって構成される微小な面と法線ベクトルに関する情報は、外積$d\bm X_1 \times d\bm X_2=d\bm A=\bm NdA$より得られる。ここで$\bm N$は単位法線ベクトルであり、$dA$は微小領域の面積である。ベクトル$d\bm A$のことをを{\bf 面積ベクトル}と言う。\par
+同様に変形後の微小領域が$d\bm x_1, d\bm x_2$によって構成されるとすると、その面積ベクトルは$d\bm a=d\bm x_1 \times d\bm x_2$となる。導出は省略するが、両面積ベクトルには
+\begin{equation}
+d\bm a=\bm nda=JF^{-\rm T}\bm NdA
+\end{equation}
+なる関係が成立する。また、面積自体の変化率は
+\begin{equation}
+\frac{da}{dA}=\frac{J}{\sqrt{\bm n \cdot FF^{\rm T}\bm n}}
+\end{equation}
+と書き表すことができる。
+
+\subsubsection{変形勾配テンソルの極分解}
+変形勾配テンソルは確かに物体の変形を表す重要な物理量である。しかしながら、内力に寄与する変形という観点で見たとき、実は変形勾配テンソルには無駄な要素が含まれている。前述の通り変形勾配テンソルは二つの物質点間の位置関係の変化を表している。この中には二点間の距離の変化と回転による変化が含まれる。ガリレイ不変性を考えれば、回転による変化は内力に寄与しないことが分かる。多くの物体ではひずみを基に内力を算出する構成則が採用されている。ひずみは正に二点間の距離の変化に関係するものであるため、変形勾配テンソルから回転以外の情報を抽出したくなる。\par
+そこで変形勾配テンソルの極分解を考える。線形代数によると、任意の正方行列は回転行列(直交行列)$R$と半正定値行列$U$(もしくは$V$)に分解できる。$F=RU$のように分解することを右極分解、$F=VR$のように分解することを左極分解と言う。また、$U$や$V$のことを{\bf ストレッチテンソル}と言う。なお、ストレッチテンソルは正定値対称テンソルである。\par
+剛体における変形勾配テンソルは回転テンソル$R$と一致する。そのため回転テンソルは$R_{iJ}(\bm e_i\otimes \bm E_J)$で書き表されるツーポイントテンソルである。従って$V$は$d\bm x=VRd\bm X$であることを考えると、$V=V_{ij}(\bm e_i \otimes \bm e_j)$の現在配置を参照する物理量であると分かる。これは回転運動を済ませた後に、現在配置上で考えた膨張圧縮運動であると考えればよい。一方で$U$は$d\bm x=RUd\bm X$であることを考えると、$U=U_{IJ}(\bm E_I \otimes \bm E_J)$のように基準配置を参照する物理量であると分かる。$U$の物理的解釈は難しく、あくまで数学的処理の結果生まれた物理量とみなせばよい(連続体力学では解釈の難しい物理量がいくつか存在する)。
+
+\subsection{ひずみテンソル}
+\subsubsection{コーシー-グリーンテンソル}
+前述の通りストレッチテンソルは内力に寄与する重要な物理量である。回転テンソルは直行テンソルであるため、$F^{\rm T}F=U^2$および$FF^{\rm T}=V^2$なる関係が得られる。これはストレッチテンソルに相当する情報を得るのにわざわざ変形勾配テンソルを極分解する必要がないことを示している。従って$U^2$および$V^2$は手っ取り早く得られてかつ価値のある存在であるため、連続体力学ではこれらを重宝する。前者のことを{\bf 右コーシー-グリーンテンソル}と言い、一般的に
+\begin{equation}
+C=U^2=F_{kI}F_{kJ}(\bm E_I \otimes \bm E_J)
+\end{equation}
+のように書き表す。当然ながら$C$は$U$と同様に基準配置を参照する物理量である。一方で後者のことを{\bf 左コーシー-グリーンテンソル}と言い、一般的に
+\begin{equation}
+\bm b=V^2=F_{iK}F_{jK}(\bm e_i \otimes \bm e_j)
+\end{equation}
+のように書き表す。$\bm b$は$V$と同様に現在配置を参照する物理量である。
+
+\subsubsection{有限ひずみテンソル}
+材料力学で学んだように、ひずみの描像において微小領域の長さの変化は重要である。そこで基準配置の微分ベクトル$d\bm X$と現在配置の微分ベクトル$d\bm x$を考え、それぞれの長さを$dS$および$ds$とする。このとき、
+\begin{equation}
+(ds)^2=d\bm x \cdot d\bm x=(Fd\bm X)\cdot (Fd\bm X)=d\bm X \cdot Cd\bm X \notag
+\end{equation}
+なる関係が得られる。従って右コーシー-グリーンテンソルは$d\bm X$から変形後の微分ベクトルの長さの二乗を算出する2解テンソルと解釈できる。\par
+一方で、$dS$に関しては
+\begin{equation}
+(dS)^2=d\bm X \cdot d\bm X=(F^{-1}d\bm x)\cdot (F^{-1}d\bm x)=d\bm x \cdot \bm b^{-1}d\bm x \notag
+\end{equation}
+となるので、$\bm b^{-1}$は$d\bm x$から元の微分ベクトルの長さの二乗を算出する2解テンソルと解釈できる。\par
+上式より変形による微分ベクトルの長さの変化量について考えることができる。つまり、
+\begin{equation}
+(ds)^2-(dS)^2=d\bm x\cdot d\bm x-d\bm X\cdot d\bm X=d\bm X\cdot(C-I)d\bm X \notag
+\end{equation}
+もしくは
+\begin{equation}
+(ds)^2-(dS)^2=d\bm x\cdot d\bm x-d\bm X\cdot d\bm X=d\bm x\cdot(I-\bm b^{-1})d\bm x \notag
+\end{equation}
+なる関係が得られる。上式はそれぞれ微分ベクトルから長さの二乗の変化量を求める式であると解釈できるため、$C-I$および$I-\bm b^{-1}$も物理的に重要な2解テンソルと言える。連続体力学では、{\bf ラグランジュ-グリーンひずみテンソル}という名で
+\begin{equation}
+E=\frac{1}{2}(C-I)
+\end{equation}
+を定義し、{\bf オイラー-アルマンジひずみテンソル}という名で
+\begin{equation}
+\bm e=\frac{1}{2}(I-\bm b^{-1})
+\end{equation}
+を定義している。定義より前者は基準配置を参照する物理量であり、後者は現在配置を参照する物理量だとわかる。また、後述の{\bf 微小ひずみテンソル}と区別するために、両者を{\bf 有限ひずみテンソル}と呼んでいる。
+
+\subsubsection{微小変形理論}
+例えば振動のような問題では物体の変位は微小であるため、$\bm x=\bm X+\bm u$(式(2.5))において$\bm x$と$\bm X$は同じ値となる。したがってこのような問題では基準配置と現在配置を区別する必要はない。このような仮定の上での理論を{\bf 微小変形理論}と言う。\par
+変位$\bm u$を用いれば、変形勾配テンソルは$F=\partial \bm x/\partial \bm X=\partial(\bm X+\bm u)/\partial \bm X=I+\partial \bm u/\partial \bm X$となるが、現在配置と基準配置が区別できないため、$\partial \bm u/\partial \bm X=\partial u/\partial \bm x$としてもよい。慣習的に微小変形理論では現在配置を採用し、基準配置を考えない。このとき、有限ひずみテンソルはそれぞれ
+\begin{equation}
+E=\frac{1}{2}(C-I)=\frac{1}{2}(F^{\rm T}F-I)=\frac{1}{2}\left\{ \left(\frac{\partial \bm u}{\partial \bm x}\right)+\left(\frac{\partial \bm u}{\partial \bm x}\right)^{\rm T}+\left(\frac{\partial \bm u}{\partial \bm x}\right)^{\rm T}\left(\frac{\partial \bm u}{\partial \bm x}\right)  \right\} \notag
+\end{equation}
+\begin{equation}
+\bm e=\frac{1}{2}(I-\bm b^{-1})=\frac{1}{2}(I - F^{-\rm T}F^{-1})=\frac{1}{2}\left\{ \left(\frac{\partial \bm u}{\partial \bm x}\right)+\left(\frac{\partial \bm u}{\partial \bm x}\right)^{\rm T}-\left(\frac{\partial \bm u}{\partial \bm x}\right)^{\rm T}\left(\frac{\partial \bm u}{\partial \bm x}\right)  \right\} \notag
+\end{equation}
+となるが、$\bm u$に関する二次の微小項を無視すると、$E$と$\bm e$の区別はなくなり、
+\begin{equation}
+E=\bm e=\frac{1}{2}\left\{ \left(\frac{\partial \bm u}{\partial \bm x}\right)+\left(\frac{\partial \bm u}{\partial \bm x}\right)^{\rm T} \right\}=\frac{1}{2}\left(\frac{\partial u_i}{\partial x_j}+\frac{\partial u_j}{\partial x_i}\right)(\bm e_i \otimes \bm e_j) = \bm \epsilon
+\end{equation}
+となる。このようなテンソルを{\bf 微小ひずみテンソル}と言う。
+
+\subsection{物体の変形速度}
+2.2節と2.3節では主に物体の変形について扱ってきた。例えば固体の内力の算出ではひずみ量が重要になってくる。一方で流体における内力計算では変形量の時間変化率が重要となってくる。そこで本節では変形速度について考える。\par
+変形を表す物理量に変形勾配テンソルがあったので、変形勾配テンソルの時間変化率は変形の時間変化について表していると言える。いま、物質点の変形勾配テンソル$F(\bm X, t)$が与えられているとし、これの物質時間微分を考える。定義より、
+\begin{equation}
+\frac{DF}{Dt}=\frac{D}{Dt}\left\{ \frac{\partial \phi(\bm X, t)}{\partial \bm X} \right\}=\frac{\partial }{\partial \bm X}\left\{ \frac{\partial \phi}{\partial t} \right\} \notag
+\end{equation}
+であるが、式(2.6)より
+\begin{equation}
+\frac{DF}{Dt}=\frac{\partial \tilde{\bm v}(\bm X, t)}{\partial \bm X}=\frac{\partial \tilde{v_i}(\bm X. t)}{\partial X_J}(\bm e_i \otimes \bm E_J)=\frac{\partial \bm v(\bm x, t)}{\partial \bm X}=\frac{\partial v_i(\bm x, t)}{\partial X_J}(\bm e_i \otimes \bm E_J)
+\end{equation}
+のように書き換えることができる。従って変形勾配テンソルの物質時間微分は速度ベクトル場の物質座標$\bm X$における勾配であり、物質点$\bm X$近傍の微分ベクトル$d\bm X$に作用して速度の微分ベクトル$d\bm v$(もしくは$d\tilde{\bm v}$)を算出するツーポントテンソルである。
+\begin{equation}
+d\bm v(\bm x, t)=d\tilde{\bm v}(\bm X, t)=\frac{DF}{Dt}d\bm X
+\end{equation}\par
+一方で現在配置における速度場$\bm v$の空間座標$\bm x$に関する勾配を{\bf 速度勾配テンソル}と言い、次式で定義する。
+\begin{equation}
+\bm l=\frac{\partial \bm v}{\partial \bm x}=\frac{\partial v_i}{\partial x_j}(\bm e_i \otimes \bm e_j)
+\end{equation}
+定義より、速度勾配テンソルは現在配置$\bm x$近傍の微分ベクトル$d\bm x$を入力とし、速度の微分ベクトル$d\bm v$を出力とするような現在配置を参照する2解テンソルである(2.2節では速度勾配テンソルに相当する物理量を考えなかったので、すこし唐突に感じたかもしれない。ただ流体力学では非常に重要な物理量であるし、この後の式展開でも登場することになるので、この時点で紹介することにした)。つまり、
+\begin{equation}
+d\bm v=\bm ld\bm x
+\end{equation}
+が成立する。また、変形勾配テンソルの間には以下の関係式が成立する。
+\begin{equation}
+\frac{DF}{Dt}=\frac{\partial \bm v}{\partial \bm X}=\frac{\partial \bm v}{\partial \bm x}\frac{\partial \bm x}{\partial \bm X}=\bm lF
+\end{equation}
+速度勾配テンソルを対称テンソル$\bm d=(\bm l+\bm l^{\rm T})/2$と反対称テンソル$\bm d=(\bm l-\bm l^{\rm T})/2$に分解したとき、それぞれを{\bf 変形速度テンソル}、{\bf スピンテンソル}と言う。
+\subsubsection{有限ひずみテンソルの物質時間微分}
+次に有限ひずみテンソルの物質時間微分について考える。それぞれについて
+\begin{equation}
+\frac{DE}{Dt}=\frac{1}{2}\frac{D}{Dt}(F^{\rm T}F-I)=F^{\rm T}\bm dF
+\end{equation}
+\begin{equation}
+\frac{D\bm e}{Dt}=\frac{1}{2}\frac{D}{Dt}(I-(FF^{\rm T})^{-1})=\frac{1}{2}(\bm b^{-1}\bm l+\bm l^{\rm T}\bm b^{-1})
+\end{equation}
+が得られる。
+
+\section{支配方程式}
+物理現象の中で最も重要なものの一つに保存則があり、連続体力学も保存則から支配方程式を導出する。保存則の中でも特によく議論されるのが質量保存則と運動量保存則であろう。なお、モーメントの保存則はコーシー応力テンソルの対称性より自ずと満たされる。エネルギー保存則が重要となるような問題もあるが、本資料では触れない。\par
+保存則を一言で表せば、系内における物理量の変化量と境界で流入出する流束で満たされるつり合いの式である。例えばオイラー形式で考えた場合、体積$dv$の部分系の総質量は$\rho dv$となる。ここで$\rho=\rho(\bm x, t)$は密度場である。オイラー形式なので部分系は移動しない。そのため質量の時間変化率は$(\partial_t\rho)dv$となる。一方で部分系の境界で流入出する質量は${\rm div}(\rho\bm v)dv$となる。従って質量保存則(もしくは連続の式)は
+\begin{equation}
+\partial_t\rho + {\rm div}(\rho\bm v) = \frac{D\rho}{Dt}+\rho{\rm div}\bm v=0
+\end{equation}
+のように書き表される。なお、いまはオイラー形式で質量保存則を導出したが、ラグランジュ形式でも同様の結果が導出される。この場合の$\rho{\rm div}\bm v$は部分系の体積変化による密度変化だと解釈すればよい。\par
+次に運動量保存則を考えよう。同様にオイラー形式の部分系を考えると、
+\begin{equation}
+\frac{D}{Dt}\int_V \rho \bm vdv=\int_{\partial V}\bm tds+\int_V \rho \bm gdv \notag
+\end{equation}
+なるつり合いの式を得る。ここで右辺第一項は内力による境界面での力の流入であり、第二項は体積力による力の流入である。内力は応力テンソルと境界面の単位法線ベクトルより求まる。また第一項の面積分を発散定理より体積積分に変える。また、上式のつり合いは任意の部分系で満たされるので、最終的に以下の式が得られる。
+\begin{equation}
+\rho\frac{D\bm v}{Dt}={\rm div}\bm \sigma +\rho\bm g
+\end{equation}
+ここで$\bm \sigma$はコーシー応力テンソルである。もちろん式(3.2)はラグランジュ形式でも利用可能である。
+\subsection{支配方程式の弱形式}
+式(3.1)(3.2)の支配方程式を{\bf 強形式}と言い、有限体積法や有限差分法で用いられる。一方で有限要素法では{\bf 弱形式}という別のものが利用されている。弱形式の導出にはダランベールの原理を用いるが、本資料では厳密に議論しないことにした。\par
+弱形式では部分系$V$ではなく全体系を考える。全体系が占める領域は現在配置$B_t$となる。ここで、系の境界を$\partial B_t$と置く。境界には境界条件が与えられており、一般的な境界条件としてノイマン型とディリクレ型がある。ノイマン境界条件が定められている境界を$\partial B_t^\sigma$とし、ディリクレ境界条件が定められている境界を$\partial B_t^u$とする。なお、$\partial B_t = \partial B_t^\sigma \cup \partial B_t^u$かつ$\partial B_t^\sigma \cap \partial B_t^u$は空集合である。\par
+いま、任意の部分系が式(3.2)を満たしている、つまり慣性力を含めてつり合い状態にあるとする。この状態で部分系に仮想的な微小変位$\delta \bm u(\bm x)$を施したとしよう。ただしディリクレ境界条件を満たすために、$\delta \bm u=\bm 0 (\bm x \in \partial B_t^u)$とする。このとき部分系は釣り合っているため変位による仕事はゼロと言える。従って全体系で考えた場合
+\begin{equation}
+\int_{B_t}\left\{{\rm div}\bm \sigma + \rho \left(\bm g - \frac{D\bm v}{Dt}\right)\right\} \cdot \delta \bm udv=0 \notag
+\end{equation}
+が成立する。このような形式を弱形式と言う。\par
+ノイマン境界条件を満たす任意の仮想変位に対して上式が成立するならば、上式と式(3.2)の条件は同値になる。従って「弱形式は全体的に見て等式が成立することを要求している分緩い制約だ」と考えるのは誤解である。詳細な説明は省くが、物理現象で見かける支配方程式ににおいて、強形式では解に2回微分可能な関数を要求する一方、弱形式の場合1回微分可能であれば十分なこともある。関数の滑らかさに対する要求が緩いという意味で、弱形式と名付けられたに過ぎない。\par
+さて、上式の第一項について
+\begin{equation}
+\int_{B_t}{\rm div}\bm \sigma \cdot \delta \bm udv=\int_{B_t}{\rm div}(\bm \sigma\delta \bm u)dv - \int_{B_t}\bm \sigma:\left(\frac{\partial \delta \bm u}{\partial \bm x}\right)dv \notag
+\end{equation}
+が言える。ここで$:$は2解テンソルの内積である。上式の第一項に対して発散定理を施す。ディリクレ境界条件上において$\delta \bm u=\bm 0$であることを考えると、弱形式は
+\begin{equation}
+\int_{B_t}\bm \sigma : \left(\frac{\partial \delta \bm u}{\partial \bm x}\right)dv=\int_{\partial B_t^\sigma}\bm t\cdot \delta \bm uds+\int_{B_t}\rho\left(\bm g - \frac{D\bm v}{Dt}\right)\cdot \delta \bm udv \notag
+\end{equation}
+のように書き換えられる。ここで、ノイマン境界条件を$\bm \sigma\bm n=\bm t$とした。コーシー応力テンソルは対称テンソルであるため、上式左辺の内積では$\partial(\delta \bm u)/\partial \bm x$を直行分解したときの対称テンソル、つまり
+\begin{equation}
+\delta \bm \epsilon=\frac{1}{2}\left[ \left(\frac{\partial \delta \bm u}{\partial \bm x}\right)+\left(\frac{\partial \delta \bm u}{\partial \bm x}\right)^{\rm T} \right] \notag
+\end{equation}
+のみを考えればよい。$\delta \bm \epsilon$は微小ひずみテンソル(式(2.19))と類似している(ただし本節の議論が微小変形理論においてのみ成立するという訳ではない)。そのため$\delta \bm \epsilon$のことを仮想変位に対するひずみということで{\bf 仮想ひずみ}と言う。当然ながら仮想ひずみは現在配置を参照する物理量である。\par
+最終的に、弱形式は以下のように書き表される。
+\begin{equation}
+\int_{B_t} \rho\frac{D\bm v}{Dt}\cdot \delta \bm udv + \int_{B_t}\bm \sigma : \delta \bm \epsilon dv=\int_{\partial B_t^\sigma}\bm t\cdot \delta \bm uds+\int_{B_t}\rho\bm g \cdot \delta \bm u dv
+\end{equation}
+仮に$\bm \sigma$がひずみ、つまり変位の微分で表現できる場合、式(3.2)の強形式だと解$\bm u$に2回微分が可能であることを要求する。一方で式(3.3)だと1回微分のみで済むので、$\bm u$に対する要求が緩和されたと言える。\par
+なお、仮想変位を仮想速度$\delta \bm v$に言い換えても同様の議論が可能で、
+\begin{equation}
+\int_{B_t} \rho\frac{D\bm v}{Dt}\cdot \delta \bm vdv + \int_{B_t}\bm \sigma : \delta \bm d dv=\int_{\partial B_t^\sigma}\bm t\cdot \delta \bm vds+\int_{B_t}\rho\bm g \cdot \delta \bm v dv
+\end{equation}
+なる結果が得られる。ここで
+\begin{equation}
+\delta \bm d=\frac{1}{2}\left[ \left(\frac{\partial \delta \bm v}{\partial \bm x}\right)+\left(\frac{\partial \delta \bm v}{\partial \bm x}\right)^{\rm T} \right] \notag
+\end{equation}
+であり、{\bf 仮想変形速度テンソル}と言う。式(3.3)は単位時間当たりの仕事におけるつり合いとして考えればよい。
+
+\section{様々な応力テンソル}
+式(3.3)(3.4)は運動量保存則に関する弱形式であり、弱形式はダランベールの原理により導出された。ダランベールの原理では仮想変位もしくは仮想変位速度と、それに伴う仮想仕事を考える。式(3.3)(3.4)の左辺第二項も仮想仕事の一部であり、これらはコーシー応力テンソルと仮想ひずみテンソル(もしくは仮想変形速度テンソル)から仮想仕事が求められることを意味している。$\bm \sigma$と$\delta \bm \epsilon$、もしくは$\bm \sigma$と$\delta \bm d$の関係を「仕事に関して共役である」と言う。\par
+ところで弱形式は現在配置$B_t$を積分領域としているが、これは計算上扱いにくい。現在配置は物体の運動に伴い時々刻々変化するためである。そのため基準配置$B_0$が積分領域になるように積分変数の変換し、各物理量も物質座標を基に定義されれば計算が容易になる。連続体力学では変数変換によってできた応力テンソルにも名前を付けており、本節では順を追って紹介していく。
+\subsection{キルヒホッフ応力テンソル}
+式(3.3)について積分変数を$\bm x$から$\bm X$に変えたならば、式(2.12)(2.14)より式(3.3)は
+\begin{equation}
+\int_{B_0} \rho_0\frac{D\bm v}{Dt}\cdot \delta \bm udV + \int_{B_0}\bm \tau : \delta \bm \epsilon dV=\int_{B_0}\rho_0\bm g\cdot \delta \bm udV+\int_{\partial B_0^\sigma}\bm T\cdot \delta \bm udS,~~\bm \tau=J\bm \sigma,~~\rho_0=J\rho,~~\bm T=\frac{J}{\sqrt{\bm n\cdot \bm b\bm n}}\bm t
+\end{equation}
+のように変換される。この$\bm \tau$のことを{\bf キルヒホッフ応力テンソル}と言う。\par
+式(3.4)の変換についても同様で、結果は以下の通りである。
+\begin{equation}
+\int_{B_0} \rho_0\frac{D\bm v}{Dt}\cdot \delta \bm vdV + \int_{B_0}\bm \tau : \delta \bm d dV=\int_{B_0}\rho_0\bm g\cdot \delta \bm vdV+\int_{\partial B_0^\sigma}\bm T\cdot \delta \bm vdS
+\end{equation}
+この変換により晴れて積分領域は基準配置になった。しかしながらキルヒホッフ応力テンソルや仮想ひずみテンソルなどは空間座標で定義されたものであるため、変換は不十分であると言える。
+
+\subsection{第一ピオラ-キルヒホッフテンソル}
+キルヒホッフ応力テンソルの欠点を受けて、仮想ひずみテンソルを変形勾配テンソルで書き換えることを考える。まず、仮想変位$\delta \bm u$に対する変形勾配テンソルを$\delta F$とする。これは以下のように書き表すことができる。
+\begin{equation}
+\delta F=\frac{\partial \delta \bm u}{\partial \bm X}=\frac{\partial \delta \bm u}{\partial \bm x}F \notag
+\end{equation}
+従って、$\bm \sigma$と$\partial(\delta \bm u)/\partial \bm x$の内積が$\bm \sigma$と$\delta \bm \epsilon$の内積と等しいことを思い出すと(式(3.3))、
+\begin{equation}
+\bm \tau : \delta \bm \epsilon=J\bm \sigma : \frac{\partial(\delta \bm u)}{\partial \bm x}=J\bm \sigma : (\delta F)F^{-1}=J\bm \sigma F^{-\rm T}:\delta F=P:\delta F,~~P=J\bm \sigma F^{-\rm T}
+\end{equation}
+であることが分かる。以上より式(3.3)は以下のように変換される。
+\begin{equation}
+\int_{B_0} \rho_0\frac{D\bm v}{Dt}\cdot \delta \bm udV + \int_{B_0}P : \delta F dV=\int_{B_0}\rho_0\bm g\cdot \delta \bm udV+\int_{\partial B_0^\sigma}\bm T\cdot \delta \bm udS
+\end{equation}
+右辺第二項は仮想仕事の一部であるため、$P$と$\delta F$は仕事に関して共役である。この$P$のことを{\bf 第一ピオラ-キルヒホッフテンソル}と言う。定義より$P=J\sigma_{ik}F^{-1}_{Jk}(\bm e_i \otimes \bm E_J)$であるため、ツーポイントテンソルだと分かる。したがって物質座標への変換はまだ完了していない。\par
+なお、仮想変位速度における弱形式も同様に導出できる。$\delta F$の代わりに
+\begin{equation}
+\delta \left(\frac{DF}{Dt}\right)=\frac{\partial \delta \bm v}{\partial \bm X}=\frac{\partial \delta \bm v}{\partial \bm x}F=\delta \bm lF \notag
+\end{equation}
+を導入したとき、式(3.4)は以下のように変換される。
+\begin{equation}
+\int_{B_0} \rho_0\frac{D\bm v}{Dt}\cdot \delta \bm vdV + \int_{B_0}P : \delta \left(\frac{DF}{Dt}\right)  dV=\int_{B_0}\rho_0\bm g\cdot \delta \bm vdV+\int_{\partial B_0^\sigma}\bm T\cdot \delta \bm vdS
+\end{equation}
+
+\subsection{第二ピオラ-キルヒホッフ応力テンソル}
+第一ピオラ-キルヒホッフ応力テンソルを基準配置を参照する物理量に変換することを考えていく。天下り式だが、これには仮想変位に対するラグランジュ-グリーンひずみテンソル$\delta \bm E$を考えればよい。定義より、$\delta \bm E=F^{\rm T}\delta \bm \epsilon F$であるため、
+\begin{equation}
+\bm \tau:\delta \bm \epsilon=J\bm \sigma:F^{-\rm T}\delta \bm EF^{-1}=JF^{-1}\bm \sigma F^{-\rm T}:\delta \bm E=S:\delta \bm E
+\end{equation}
+の関係が成立する。この$S$のことを{\bf 第二ピオラ-キルヒホッフ応力テンソル}と言う。明らかにこれは基準配置を参照している。\par
+第二ピオラ-キルヒホッフ応力テンソルを用いることで、基準配置を参照した運動量保存則の表現を得る。
+\begin{equation}
+\int_{B_0} \rho_0\frac{D\bm v}{Dt}\cdot \delta \bm udV + \int_{B_0}S : \delta \bm E dV=\int_{B_0}\rho_0\bm g\cdot \delta \bm udV+\int_{\partial B_0^\sigma}\bm T\cdot \delta \bm udS
+\end{equation}
+仮想変位速度を用いた場合も同様の手順で導出できる。$\delta \bm E$の代わりに
+\begin{equation}
+\delta \left(\frac{DE}{Dt}\right)=F^{\rm T}\delta \bm dF \notag
+\end{equation}
+を導入したとき、式(3.4)は以下のように書き換えられる。
+\begin{equation}
+\int_{B_0} \rho_0\frac{D\bm v}{Dt}\cdot \delta \bm vdV + \int_{B_0}P : \delta \left(\frac{DE}{Dt}\right)  dV=\int_{B_0}\rho_0\bm g\cdot \delta \bm vdV+\int_{\partial B_0^\sigma}\bm T\cdot \delta \bm vdS
+\end{equation}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+

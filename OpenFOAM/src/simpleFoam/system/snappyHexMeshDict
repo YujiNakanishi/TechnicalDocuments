@@ -1,0 +1,136 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+
+castellatedMesh true;
+snap            true;
+addLayers       false;
+
+geometry
+{
+	cyl.stl
+	{
+		type	triSurfaceMesh;
+		name	cyl;
+	}
+}
+
+castellatedMeshControls
+{
+	maxLocalCells 100000;
+	maxGlobalCells 2000000;
+	minRefinementCells 0;
+	maxLoadUnbalance 0.10;
+	nCellsBetweenLevels 1;
+	features
+	(
+		{
+			file "cyl.eMesh";
+			level 0;
+		}
+	);
+
+	refinementSurfaces
+	{
+		cyl
+		{
+			level (0 0);
+			regions
+			{
+				side
+				{
+					level (0 0);
+					patchInfo
+					{
+						type	wall;
+					}
+				}
+			}
+		}
+		inlet
+		{
+			level (0 0);
+		}
+		outlet
+		{
+			level (0 0);
+		}
+		wall
+		{
+			level (0 0);
+		}
+		no_dim
+		{
+			level (0 0);
+		}
+	}
+
+	resolveFeatureAngle	30;
+	refinementRegions
+	{}
+
+	locationInMesh (2.003 0.003 0.0);
+	allowFreeStandingZoneFaces true;
+
+}
+
+snapControls
+{
+	nSmoothPatch			3;
+	tolerance				2.0;
+	nSolveIter				30;
+	nRelaxIter				5;
+	nFeatureSnapIter		10;
+	implicitFeatureSnape	false;
+	explicitFeatureSnape	true;
+	multiRegionFeatureSnape	false;
+}
+addLayersControls
+{
+    relativeSizes   true;
+    expansionRatio  1.0;
+    finalLayerThickness 0.3;
+    minThickness    0.25;
+    layers
+    {
+        "cyl_side"
+        {
+            nSurfaceLayers  3;
+        }
+    }
+    nGrow   0;
+    featureAngle    130;
+    maxFaceThicknessRatio   0.5;
+    nSmoothSurfaceNormals   1;
+    nSmoothThickness    10;
+    minMedialAxisAngle  90;
+    maxThicknessToMedialRatio    0.3;
+    nSmoothNormals  3;
+    slipFeatureAngle    30;
+    nRelaxIter  5;
+    nBufferCellsNoExtrude   0;
+    nLayerIter  50;
+    nRelaxedIter    20;
+}
+meshQualityControls
+{
+	maxNonOrtho			65;
+	maxBoundarySkewness 20;
+	maxInternalSkewness 4;
+	maxConcave 			80;
+	minVol 				1e-13;
+	minTetQuality 		1e-15;
+	minArea 			-1;
+	minTwist 			0.02;
+	minDeterminant 		0.001;
+	minFaceWeight 		0.05;
+	minVolRatio 		0.01;
+	minTriangleTwist 	-1;
+    errorReduction  0.75;
+    nSmoothScale    4;
+}
+mergeTolerance 1e-6;
