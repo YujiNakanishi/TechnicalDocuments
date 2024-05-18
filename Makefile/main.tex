@@ -1,0 +1,382 @@
+\documentclass[dvipdfmx, 9pt, a4paper]{jsarticle}
+\usepackage[margin=15mm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{amsmath,  amssymb}
+\usepackage{type1cm}
+\usepackage{latexsym}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{ascmac}
+\usepackage{listings,jvlisting}
+\usepackage{tcolorbox}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{9}
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{9}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+\renewcommand{\thefigure}{\arabic{section}.\arabic{figure}}
+\renewcommand{\thetable}{\arabic{section}.\arabic{table}}
+\makeatletter
+\@addtoreset{equation}{section}
+\@addtoreset{figure}{section}
+\@addtoreset{table}{section}
+\AtBeginDocument{
+  \renewcommand*{\thelstlisting}{\arabic{section}.\arabic{lstlisting}}%
+  \@addtoreset{lstlisting}{section}
+}
+
+\numberwithin{equation}{section}
+
+\renewcommand{\baselinestretch}{0.78}
+\newcommand{\bm}[1]{{\mbox{\boldmath $#1$}}}
+\newcommand{\bnabla}{\bm \nabla}
+\newtheorem{Proof}{証明}
+\def\qed{\hfill $\Box$}
+
+\lstset{language=make,%
+        basicstyle=\footnotesize,%
+        commentstyle=\textit,%
+        classoffset=1,%
+        keywordstyle=\bfseries,%
+	frame=tRBl,framesep=5pt,%
+	showstringspaces=false,%
+        numbers=left,stepnumber=1,numberstyle=\footnotesize%
+	}%
+
+
+\begin{document}
+\begin{center}
+{\fontsize{18pt}{1pt}\selectfont make}\\
+\end{center}
+
+\section*{はじめに}
+{\bf make}はプログラム構築のための自動化ツールであり、ソフトウェア開発の現場では今でもよく利用されている。一般的にソフトウェア開発はソースコードの編集からコンパイルやリンク、そして実行ファイルの作成の順で進めていくが、このうち煩雑でミスの出やすいコンパイルから実行ファイルの作成の手作業部分をmakeは代行する。例えば{\bf Makefile}という名前のファイルに関連するソースファイル名や処理の組み合わせを記述し、makeを実行すれば実行ファイルが作成される訳である。このとき、ソースファイルの依存関係をmakeは理解し、処理を自動的に進めてくれる。それゆえソフトウェア開発でのミスを大幅に減らしてくれる訳である。\par
+GUIによるツールが主流になるにつれてmakeは無用なものとなりつつあったが、近年では再びCUIが注目され、それに伴いmakeも見直されてきている。本資料ではmakeの基本的な内容を紹介していく。
+\section{Makefileとmake}
+\subsection{Makefileの基本的な書式}
+Makefileは複数の{\bf ルール}で構成される。ここでルールとは処理内容と入出力ファイルが明記されたもののことで、筆者は関数のようなものをイメージしている。ルールの書き方は以下の通りである。
+\begin{lstlisting}[caption=Ruleの書き方]
+target : prereg1, prereg2, ...
+	command1
+	command2
+	...
+\end{lstlisting}\par
+{\bf ターゲット}はルールによって生成したいファイルなどであり、実行ファイルなどが当てはまる。{\bf 依存ファイル}(もしくは必須項目=prereg)はtargetを生成する上で必要なファイルのことで、メインファイルやヘッダーファイルなどがここに記述される。ルールを書くうえで依存ファイルは複数あってもよく、依存ファイルが無いことも許される。一方でターゲットは必ず1つ以上記述されなければならない。\par
+ターゲットと依存ファイルを指定した後、処理コマンドを下に記載していく。ここで処理コマンドは必ずタブで字下げをしなければならない。ただし、コマンドが1つだけかつ短ければ、下記のように記述することもできる。
+\begin{lstlisting}[caption=Ruleの書き方2]
+target : prereg1, prereg2, ... ; command
+\end{lstlisting}\par
+以下はmain.f90のソースファイルをコンパイルし、target.outという名の実効ファイルを作成する例である。例えばこのMakefileをmain.f90と同じディレクトリに保存し、そこで「make」と実行すればtarget.outが作成される。
+\begin{lstlisting}[caption=Makefile例]
+target.out : main.f90
+	gfortran -o target.out main.f90
+\end{lstlisting}\par
+Makefileではコメントアウトと改行を行うことができる。
+\begin{itemize}
+\item {\bf コメント}：「\#」を使えば、それ以降の文字から行末まではコメントアウトされる。
+\item {\bf 改行}：Makefileには、Cにおける「;」のような文の終端を表す文字が存在せず、Pythonのように改行までの1行が一つの処理だと判断される。長いコメントを書くときなどに改行が必要となるが、MakefileはPythonと同様にバックスラッシュ(Windowsでは円マーク)を用いて改行する。バックスラッシュの前後は1個の空白に置き換えられる。また、折り返し後の字下げは無視される。例えばListing1.4は「abc def ghi」と解釈される。
+\end{itemize}
+\begin{lstlisting}[caption=Makefileにおける改行]
+abc\
+	def\
+ghi
+\end{lstlisting}\par
+上記の通り行の取り扱いはPythonと似ているが、空行の行頭におけるタブ文字の扱いには注意が必要である。タブ文字のない空行なら両者とも無視するが、タブ文字が行頭にある空行の場合、Pythonはそれでも無視する一方でMakefileではエラーが生じる。
+
+\subsection{makeの基礎}
+makeのコマンドラインは以下の通りである。
+\begin{center}
+make [-f {\it makefile}] [{\it option}] [{\it target}]
+\end{center}
+makeには多くのオプションが用意されているが、中でも以下の書式を使うことが多い。
+\begin{itemize}
+\item make：カレントディレクトリのMakefileを読み込む。
+\item make {\it target} : Makefile中の特定のターゲットを指定する。
+\item make -f  {\it makefile} : -fに続くファイルをMakefileとして読み込む。
+\item make -f {\it makefile} target : 指定のファイルをMakefileとして読み込み、その中のtargetを指定。
+\item make -C subdir : サブディレクトリsubdirの中でmakeを実行。
+\end{itemize}\par
+makeはMakefileに記述されたルールを基に判断し、ターゲットの作成に必要なコマンドを実行する。しかもルールが上手く記述されていれば、不要な処理を省略する機能もついている。本節ではmakeがどのような論理で処理を実行もしくは回避するのか、そしてどういったときにエラーとなってしまうのか見ていく。\par
+
+\subsubsection{makeの木構造的考え方}
+基本的にmakeの主目的はターゲットの作成である。ターゲットの作成には依存ファイルが必要で、準備されていればmakeはターゲットを作成することができる(Listing1.3)。\par
+Makefileには複数のルールを記述することができる。例えばListing1.3は1つのコマンドで実行ファイルまで作成しているが、それをコンパイルと実行ファイルの2段階に分割した場合を考えよう。このとき、下記のようなMakefileが考えられる。
+\begin{lstlisting}[caption=複数のターゲットがあるMakefile]
+target.out : main.o
+	gfortran -o target.out main.o
+
+main.o : main.f90
+	gfortran -c main.f90
+\end{lstlisting}\par
+一般的なプログラミング言語の場合、処理は行の順に施される。makeの場合も同様で、ルールの中の処理は行の順に進む。しかしながら、ルールに関してはそうでない。makeは最終的に一つのルールのターゲットを作る。これを最終目的のルールと呼ぶことにしよう。最終目的であるルールは、デフォルト設定ならばMakefileの先頭のルールになる。例えばListing1.5を下記のように書き直したとする。この場合はmain.oしか作成されない。
+\begin{lstlisting}[caption=複数のターゲットがあるMakefile2]
+main.o : main.f90
+	gfortran -c main.f90
+
+target.out : main.o
+	gfortran -o target.out main.o
+\end{lstlisting}\par
+Listing1.5と1.6の結果の違いは各ルールの依存関係によって生じた。例えばListing1.5の場合、makeはまずはじめにtarget.outを作成しようとするが、そこでmain.oが無いことに気付く。するとmakeはmain.oをターゲットとしたルールをMakefile内から探し、もし在るならば先にそのルールを実行する(ない場合はエラーとなる)。こうして最終目的のルールの依存ファイルがすべて用意できたとき、改めてmakeはそのルールを実行する。従ってListing1.5では2つのルールが実行された訳である。\par
+一方のListing1.6の場合、最終目的のルールはmain.f90をターゲットとしている。これは既に存在するファイルなので、ルールの実行も既に可能である。そのためtarget.outに関するルールは実行されずに終わる。\par
+このように、makeはルールを先頭から順に実行するのではなく、各ルールの依存関係を把握して必要なルールのみ適切な順で実行する。もしくは最終目的のルールを根に持つルールの木構造を構築し、補助的なルールを葉ノードから順に実行するとも言える(このような特性はmakeの{\bf 階層構造}と一般的に呼ばれている)。\par
+デフォルト設定の場合、最終目的のルールは先頭のルームになるが、これを変えるには「make target名」で実行すればよい。例えばListing1.6に対して「make target.out」と実行すれば、Listing1.5のときと同じ結果が得られる。
+\subsubsection{ルール実行の判断}
+makeは実行時に各ルールの実行要否をチェックし、不要と判断すればそのルール実行を無視する。この機能のおかげで例えばライブラリを不必要に再コンパイルすることを避け、開発時間を短縮できる。実行要否は主にターゲットの有無と関連するファイルのタイムスタンプで判断される。\par
+\begin{itemize}
+\item 対象のターゲットファイルが存在しない場合、makeはそのルールを実行する。
+\item 対象のターゲットファイルが既に存在する場合、makeはまず初めにターゲットファイルと依存ファイルのタイムスタンプを比較する。ターゲットファイルのタイムスタンプよりも後の時間のタイムスタンプである依存ファイルが存在する場合、つまり既存のターゲットファイルが作成された後に依存ファイルに何か変更があったと思われる場合、そのルールは実行される。一方そうでない場合は実行しない。
+\item 依存ファイルがないルールの場合、タイムスタンプに関わらずターゲットファイルが既に存在するならば実行しない。
+\end{itemize}
+
+\subsection{疑似ターゲット}
+前節で紹介したmake及びMakefileの特徴を利用して様々なテクニックが提案されている。本節では{\bf 疑似ターゲット}と呼ばれるいくつかのテクニックを紹介する。疑似ターゲットは特徴的なルールを用いるが、そのルールのターゲットに興味はない。
+\subsubsection{複数のルールを実行するための疑似ターゲット}
+例えば下記のようなMakefileを考える。
+\begin{lstlisting}[caption=複数のターゲットがあるMakefile3]
+tag1: ; echo "tag1"
+tag2: ; echo "tag2"
+tag3: ; echo "tag3"
+\end{lstlisting}\par
+この場合、makeは先頭のルールを最終目的とするため、"tag1"のみ出力される。\par
+すべてのターゲットを実行したい場合は、下記のような疑似ターゲットを作成するとよい。
+\begin{lstlisting}[caption=疑似ターゲットall]
+all : tag1 tag2 tag3
+
+tag1: ; echo "tag1"
+tag2: ; echo "tag2"
+tag3: ; echo "tag3"
+\end{lstlisting}\par
+この場合はallのターゲットを主目的とする訳だが、tag1やtag2、並びにtag3が作成されていないので、まずはall以外の3つのルールを実行することになる。このように、複数のルールを最終目的としたい場合はallのような疑似ターゲットを先頭にもってくるとよい(なお、ターゲットの名前は任意だが慣習的にallとすることが多い)。
+
+\subsubsection{ファイルを消すための疑似ターゲット}
+ソフトウェア開発をしているとき、デバッグのために何度もmakeを実行することがある。途中でエラーが出力された場合、そこまでの中間ファイルだけが残る。場合によっては全ての中間ファイルを消してから再実行しなければならないこともあるし、それ以外の理由でもMakefileに関わるファイルの削除機能は欲しかったりする。makeでは、こういった目的のためにcleanという疑似ターゲットを作成することが多い。下記はcleanの例である。
+\begin{lstlisting}[caption=疑似ターゲットclean]
+test1.txt : dep1.txt
+	cat dep1.txt > test1.txt
+dep1.txt:
+	echo "dep1" > dep1.txt
+clean:
+	rm -f dep1.txt test1.txt
+\end{lstlisting}\par
+単に「make」と実行した場合、test1.txtとdep1.txtが作成される。これらファイルを消したい場合は「make clean」と実行すればよい。なおallと同様に、疑似ターゲットの名前は任意だが、一般的にcleanと名付けることが多い。
+
+\subsubsection{疑似ターゲットの宣言}
+前節の疑似ターゲットall及びcleanは、ディレクトリ内にallやcleanといったファイルが存在しない場合にのみ機能する。もしもこういった名前のファイルがあるならば、場合によってはルールの実行が省略されてしまう。もちろん疑似ターゲットの名前は任意なので、他にないターゲット名をつければ済む話だが、大規模なソフトウェア開発になるにつれ困難になってくる。\par
+疑似ターゲットを宣言するには「{\bf .PHONY}」を使えばよい。以下のように書けばいかなる時もcleanは疑似ターゲットとして扱われる。
+\begin{lstlisting}[caption=.PHONY]
+.PHONY : clean
+clean: ; rm -f dep1.txt test1.txt
+\end{lstlisting}\par
+
+\section{変数}
+\subsection{変数の代入と参照}
+makeには文字列のための{\bf 変数}の機能があり、そのおかげで冗長なコマンドラインが見やすくなったり、修正が容易になったりする。
+\subsubsection{変数への代入}
+\begin{lstlisting}[caption=変数への代入]
+VAR = echo "Hello"
+\end{lstlisting}\par
+変数の代入には「=」を用いる。例えばMakefile内で上記のように宣言した場合を考えよう。このときVARは変数名であり、それに「echo "Hello"」が代入されたことになる。変数名に使える文字は「:、=、\#、空白」以外で、大文字小文字は区別される。慣習的には、全て大文字の変数名を定義することが多い。以下は変数への代入に関するルールである。
+\begin{itemize}
+\item 「=」前後の空白は無視できる。例えば「VAR =     xxx」と書いても、それは「xxx」と判定される。
+\item 文字列の末尾の空白は無視されない。例えば「VAR = xxx        」としたとき、それは「xxx        」と判定される。
+\item 代入する文字列が長いとき、バックスラッシュで改行することができる。バックスラッシュ及びその前後の空白は1個の空白に纏めて置き換えられる。折り返し後の行頭のタブや空白は無視される。例えばListing2.2の変数は「XXX YYY ZZZ」と判定される。
+\item シェルの環境変数はMakefileの中でも利用できる。つまり、Makefile内で環境変数と同じものを定義せず、例えば「\$(PATH)」と書いてもmakeには伝わる。
+\end{itemize}
+\begin{lstlisting}[caption=変数への代入]
+VAR = XXX\
+	YYY\
+	ZZZ
+\end{lstlisting}
+
+\subsubsection{変数の参照}
+変数VARに代入された文字列は、\$(VAR)もしくは\$\{VAR\}により参照できる。以下に変数参照の例を示す。
+\begin{lstlisting}[caption=変数の参照]
+ECHO = echo "Hello"
+TARGET = target.txt
+
+$(TARGET) :
+	$(ECHO) > $(TARGET)
+\end{lstlisting}\par
+以下は変数の参照に関するルールである。
+\begin{itemize}
+\item 変数の代入はルールの実行前に行われる。そのため、Listing2.4のように書くことも可能である。
+\item 一つの変数に複数回代入が施された場合、最後に代入されたものが適用される。そのため、Listing2.5の場合、ECHO=「echo "Bye"」となる。
+\item ルールのターゲットもしくは依存ファイル部分に変数を用いる場合は、そのルールよりも前の行で変数を定義しなければならない。したがってListing2.6はエラーとなる。
+\end{itemize}
+\begin{lstlisting}[caption=変数の参照例1]
+target.txt:
+	$(ECHO) > target.txt
+ECHO = echo "Hello"
+\end{lstlisting}
+\begin{lstlisting}[caption=変数の参照例2]
+ECHO = echo "Hello"
+target.txt:
+	$(ECHO) > target.txt
+ECHO = echo "Bye"
+\end{lstlisting}
+\begin{lstlisting}[caption=変数の参照例3(エラー例)]
+ECHO = echo "Hello"
+$(TARGET):
+	$(ECHO) > $(TARGET)
+ECHO = echo "Bye"
+\end{lstlisting}
+
+\subsubsection{再帰代入}
+以下の例は、\$(STR)がABCに展開されそうに見えるが、実際は変数の無限再帰でエラーとなる。
+\begin{lstlisting}[caption=無限再帰の例]
+STR = A
+STR = $(STR)BC
+\end{lstlisting}\par
+このようなときは、「STR:=\$(STR)BC」と書けばよい。記号「:=」は一回限りの置き換えを意味しており、それゆえ再帰が回避されている。
+\subsubsection{変数への追加}
+変数に「+=」で代入すると、既に代入されている文字列の末尾に新たに文字列を追加できる。例えば以下の例の場合、STRはABCとなる。
+\begin{lstlisting}[caption=文字列追加の例]
+STR = AB
+STR += C
+\end{lstlisting}
+
+\subsection{内部変数}
+依存関係の記述を簡略化できる内部変数がmakeには用意されている。以下はよく使われる内部変数である。
+\begin{itemize}
+\item {\bf \$@}：依存関係行のターゲットに置き換わる。例えばListing2.9では\$@はtest.txtを意味する。
+\item {\bf \$*}：拡張子を除くターゲット名に置き換わる。
+\item {\bf \$$<$}：先頭の依存ファイルに置き換わる。
+\item {\bf \$\verb|^|}：依存ファイルに置き換わる。例えばListing2.10では\$\verb|^|はtest1.o test2.oを意味する。
+\end{itemize}
+\begin{lstlisting}[caption=内部変数1]
+test.txt : dep.txt; cat dep.txt > $@
+\end{lstlisting}
+\begin{lstlisting}[caption=内部変数2]
+test.out: test1.o test2.o
+	gcc -o $@ $^
+\end{lstlisting}
+
+\subsection{拡張子を置換する変数}
+多くのプログラミング言語において、ソースファイルとオブジェクトファイルに拡張子以外同じ名前を使うことが多い。このようなときに、本節で紹介する変数定義は役に立つ。\par
+「\$(変数:拡張子=変換後拡張子)」は文字列であり、変数に代入された文字列の拡張子を変換後拡張子に変えたものとなっている。例えば下記の場合、OBJSは「test1.o test2.o test3.o」になる。
+\begin{lstlisting}[caption=拡張子変換]
+SRCS = test1.c test2.c test3.c
+OBJS = $(SRCS:.c=.o)
+test: OBJS; gcc -o $@ $(OBJS)
+\end{lstlisting}
+置き換えができるのは、区切られた文字列の末尾部分のみである。したがって、「SRCS=test1.ctest2.ctest3.c」と定義されていた場合、「OBJS=test1.ctest2.ctest3.o」となる。
+
+\section{makeの発展的手法}
+\subsection{コマンド行の制御}
+\subsubsection{コマンド表示の抑止}
+ルールのコマンド行が実行された場合、デフォルトでは画面上に実行されたコマンド行が表示される。それを抑止したい場合は、コマンド行の先頭に@を付ければよい。例えば下記を実行した場合、2つ目のコマンド行のみ表示されない。
+\begin{lstlisting}[caption=コマンド表示の抑止]
+test:
+	echo "shown"
+	@echo "hidden"
+>>
+echo "shown"
+shown
+hidden
+\end{lstlisting}
+\subsubsection{エラーでも中断しないコマンド行}
+コマンド行の実行が正常終了しなかった場合、デフォルトではその時点で終了する。一方でコマンド行の先頭に「-」を付けると、たとえエラーになったとしても実行を続ける。下記はその例である。
+\begin{lstlisting}[caption=エラーでも中断しない例]
+clean:
+	-rm *.txt
+\end{lstlisting}\par
+なお、「-」と「@」は「-@」のように同時に使うことができる(例「-@rm」)。
+
+\subsection{パターンルール}
+拡張子だけ異なる同名なファイルをターゲットと依存ファイルに指定することは多い。このようなとき、{\bf パターンルール}と呼ばれるものを利用すればルールの記述がシンプルになる。\par
+例えば下記のようなMakefileを考える。
+\begin{lstlisting}[caption=Makefile(パターンルール前)]
+test.out : test1.o test2.o; gcc -o $@ $^
+test1.o : test1.c; gcc -c $^ -o $@
+test2.o : test2.c; gcc -c $^ -o $@
+\end{lstlisting}\par
+test1.oとtest2.oのルールについて、両者はよく似た形をしていることがわかる(このようなケースは実際によく見られる)。また、パターンルールが利用できる条件の、同名なターゲットと依存ファイルも各ルールは満たす。このとき、「\%」を用いて下記のように書き換えることができる。
+\begin{lstlisting}[caption=Makefile(パターンルール)]
+test.out : test1.o test2.o; gcc -o $@ $^
+%.o : %.c; gcc -c $^ -o $@
+\end{lstlisting}\par
+2つ目のルールはディレクトリ内の.c拡張子を持つ任意のファイルに対し、同名で.o拡張子のファイルをターゲットとして作成する。従ってディレクトリ内にtest1.cとtest2.cが既に存在すれば、パターンルールで記述されたルールはtest1.oとtest2.oを作成する。\par
+パターンルールは各依存ファイル毎にルールの実行要否を判定する。例えばListing3.6を実行し、その後test2.cのみ更新したとする。この状態で再度Listing3.6を実行したとき、パターンルールはtest1.oのみ再作成する。
+
+\subsection{階層ディレクトリにおけるmake}
+大規模なソフトウェアを開発する場合、ファイルは階層上のディレクトリで管理する。このとき、Makefileは根ノードに当たるディレクトリだけでなく各階層のディレクトリにも作成する。当然ながら各階層にあるMakefileは、そこから下にあるファイルに関するものである。\par
+異なるディレクトリにあるMakefileを実行したい場合、1.2節で紹介したように-Cオプションを使用すればよい。しかしながら、この方法だと一度にひとつのMakefileしか実行できない。一度のmake実行で複数のMakefileの処理を行いたいならば、Makefile内のルールが更にmakeを実行すればよい。\par
+例えばカレントディレクトリにsub1とsub2、並びにsub3というサブディレクトリがあるとする。そしてカレントディレクトリ及び各サブディレクトリにMakefileが置いてある。このとき、カレントディレクトリのMakefileに下記のような疑似ターゲットを記述すれば、全てのサブディレクトリのMakefileが実行できる。
+\begin{lstlisting}[caption=階層ディレクトリにおけるmake]
+all:
+	cd sub1 && make
+	cd sub2 && $(MAKE)
+	$(MAKE) -C sub3
+	
+\end{lstlisting}\par
+1行目のコマンドはsub1に移動してからmakeを実行する。2行目のコマンドも同様だが、makeの代わりに\$(MAKE)を利用している。makeと\$(MAKE)は基本的に同じ機能であるが、\$(MAKE)はカレントディレクトリにおけるmakeを実行したときのオプションを引き継ぐことができる。例えばカレントディレクトリで「make -n」と実行した場合、\$(MAKE)は「make -n」と認識される。なお、2行目のコマンドはsub1に移動してから実行されているように見えるので、sub2が絶対パスでないと機能しないように見える。しかしながらそれは誤解で、実のところmakeにおけるコマンドは各行で完結する。つまり、1行目のコマンドでsub1に移動してからmakeを実行するが、それが終わればカレントディレクトリに戻る。それゆえ3行目のように記述しても問題はない。
+
+\subsubsection{変数の引継ぎ}
+下のディレクトリ階層のMakefileをmakeするとき、元のMakefileの変数は引き継がれない。引き継ぐためには対象の変数に対してexport処理を施す必要がある。\par
+例えば下記Makefileの場合、変数VARはsubにあるMakefileでも使えるようになる。
+\begin{lstlisting}[caption=変数の引継ぎ1]
+VAR = ABC
+export VAR
+all:; $(MAKE) -C sub	
+\end{lstlisting}\par
+exportは「export VAR = ABC」のように定義と同時に指定することもできる。またMakefile中のすべての変数を引き継ぎたい場合は下記のように単にexportと書けばよい。
+\begin{lstlisting}[caption=変数の引継ぎ2]
+VAR1 = ABC
+VAR2 = DEF
+export
+all:; $(MAKE) -C sub	
+\end{lstlisting}
+
+\subsection{条件分岐}
+Makefileには条件分岐の機能が備わっており、下記のような書き方をする。
+\begin{lstlisting}[caption=条件分岐]
+VAR = OK
+ifeq ($(VAR),OK)
+	SHOW = OK
+else
+	SHOW = NG
+endif
+target:
+	echo $(SHOW)
+\end{lstlisting}\par
+「ifeq (\$(変数), 値)」では変数に代入されている文字列と値を比較し、Trueであればその後の処理を施す。逆にFalseであればelse部分の処理を施す。条件分岐の終了はendifで明記する。else処理の記述は任意だが、endifは必ず書かなければならない。またifeqと(\$(変数), 値)の間にスペースを入れなければ「missing separator」のエラーが出力される。なお、ルール内の処理にはコマンドしか書けないので、この条件分岐はルール外でのみ利用できる。\par
+「ifeq (\$(変数),)」と書かれた場合、変数に値が代入されていればTrueと判断し、そうでない場合はFalseと判断する。同様のことは「ifdef VAR」と書いても可能である。
+
+\subsection{includeによるファイルの読み込み}
+Makefileの中に別のファイルの内容を挿入するにはincludeを使えばよい。Makefile内では「include ファイル名」のように宣言する。ファイルの内容がそのまま挿入されるため、ファイル内のコードはMakefileの書式に従っていなければならない。\par
+例えば下記のようなファイルが「flg.mk」という名前で用意されていたとする。
+\begin{lstlisting}[caption=挿入ファイル]
+FLG = OK
+ifeq ($(FLG), OK)
+SHOW = OK
+else
+SHOW = NG
+endif
+\end{lstlisting}\par
+これを別のMakefileに挿入する場合は、以下のような書き方をする。
+\begin{lstlisting}[caption=挿入ファイル2]
+include flg.mk
+test:; echo $(SHOW)
+\end{lstlisting}\par
+挿入元でSHOWという変数が定義されているため、targetに関するルールは問題なく機能する。
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+

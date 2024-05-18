@@ -1,0 +1,1750 @@
+\documentclass[dvipdfmx, 9pt, a4paper]{jsarticle}
+\usepackage[margin=15mm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{amsmath,  amssymb}
+\usepackage{type1cm}
+\usepackage{latexsym}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{ascmac}
+\usepackage{braket}
+\usepackage{listings,jvlisting}
+\usepackage{tcolorbox}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+\renewcommand{\thefigure}{\arabic{section}.\arabic{figure}}
+\renewcommand{\thetable}{\arabic{section}.\arabic{table}}
+\makeatletter
+\@addtoreset{equation}{section}
+\@addtoreset{figure}{section}
+\@addtoreset{table}{section}
+\AtBeginDocument{
+  \renewcommand*{\thelstlisting}{\arabic{section}.\arabic{lstlisting}}%
+  \@addtoreset{lstlisting}{section}
+}
+
+
+\numberwithin{equation}{subsection}
+
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{9}
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{9}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+\renewcommand{\baselinestretch}{0.78}
+\newcommand{\bm}[1]{{\mbox{\boldmath $#1$}}}
+\newcommand{\bnabla}{\bm \nabla}
+\newtheorem{Proof}{証明}
+\def\qed{\hfill $\Box$}
+
+\newcommand\pythonstyle{\lstset{
+language=Python,
+basicstyle=\ttm,
+morekeywords={self},
+keywordstyle=\ttb\color{deepblue},
+emph={MyClass,__init__},
+emphstyle=\ttb\color{deepred},
+stringstyle=\color{deepgreen},
+frame=tb,
+showstringspaces=false
+}}
+
+\lstnewenvironment{python}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+
+\newcommand\pythonexternal[2][]{{
+\pythonstyle
+\lstinputlisting[#1]{#2}}}
+\newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
+
+\begin{document}
+\begin{center}
+{\fontsize{18pt}{1pt}\selectfont 線形代数の数理}\\
+\end{center}
+\section{ベクトル空間}
+\subsection{ベクトル空間の基礎}
+\begin{tcolorbox}[title=ベクトル空間]
+　ある集合$V$の元$\bm u$と$\bm v$に関して和$\bm u+\bm v$とスカラー倍$a\bm u$が定義されており、それらが以下の条件を満たすとする。このときの集合$V$のことをベクトル空間と言う。ベクトル空間の元を特別にベクトルと言う。
+\begin{itemize}
+\item 和の結合則：$(\bm u+\bm v)+\bm w=\bm u+(\bm v+\bm w)$。
+\item 和の交換則：$\bm u+\bm v=\bm v+\bm u$。
+\item $V$に特別な元$\bm 0$が存在していて、任意の$\bm u \in V$に対して$\bm u+\bm 0=\bm u$が成立する。
+\item 任意の$\bm u \in V$に対して$\bm u+\bm v=\bm 0$となるような元$\bm v \in V$が存在する(この$\bm v$のことを$-\bm u$と書く)。
+\item スカラー倍の分配則：$a(\bm u+\bm v)=a\bm u+a\bm v$。
+\item スカラー倍の結合則：$ab(\bm u)=a(b\bm u)$。
+\end{itemize}
+\end{tcolorbox}\par
+ある集合が上記の条件を満たしているとき、その集合の元をベクトルと言う。最も馴染みのあるベクトルは、$K^n$次元空間上の矢印と例えられる$(u_1, .., u_n)^{\rm T}$であろう(このような表記をしたベクトルを特別に数ベクトルと呼ぶことが多い)。一方でベクトル空間の定義に従えば、ベクトルと呼べるものは数ベクトルに限らない。例えば多項式もベクトルの有名な例である。
+\begin{tcolorbox}[title=部分空間]
+　ベクトル空間$V$の部分集合$W$がベクトル空間の条件を満たすとき、$W$のことを$V$の部分空間と言う。
+\end{tcolorbox}
+\begin{itembox}[l]{定理1.1.1}
+　ベクトル空間$V$の部分集合$W$を考える。任意のベクトル$\bm u, \bm v \in W$が$\bm u+\bm v \in W$及び$a\bm u \in W( \in K)$を満たすとき、$W$は部分空間である。
+\end{itembox}
+
+\subsubsection{線形結合}
+\begin{tcolorbox}[title=線形結合]
+　$V$は$K$上のベクトル空間であるとし、$\bm v_i \in V(i=1, ..., n)$とする。ベクトル$\bm x \in V$に対して、$\bm x=\lambda_i \bm v_i$を満たす$\lambda_i(i=1, ..., n)$が存在するとき、$\bm x$は$\bm v_i(i=1, ..., n)$の線形結合であると言う。
+\end{tcolorbox}\par
+$\{ \bm v_1, ..., \bm v_n\}$は$V$の部分集合であるとする。$\{ \bm v_1, ..., \bm v_n\}$に関する線形結合全体の集合を$<\bm v_1, ..., \bm v_n>$と書く。明らかにこれは$V$の部分空間である。この部分空間$<\bm v_1, ..., \bm v_n>$のことを$\{ \bm v_1, ..., \bm v_n\}$が張る部分空間と言う。
+\begin{itembox}[l]{系1.1.1}
+　$V$は$K$上のベクトル空間、$W$は$V$の部分空間とする。$\bm v_i(i=1, ..., n) \in W$ならば$<\bm v_1, ..., \bm v_n> \subset W$。
+\end{itembox}
+\begin{tcolorbox}[title=線形独立と線形従属]
+$V$は$K$上のベクトル空間であるとする。$\bm v_i(i=1, ..., n) \in V$について以下の条件が成り立つとき、ベクトルの組$(\bm v_1, ..., \bm v_n)$は線形独立であると言う。また、線形独立でないベクトルの組を線形従属と言う。
+\begin{itemize}
+\item スカラーの組$\lambda_i(i=1, ..., n)$であって、$\lambda_i \bm v_i=\bm 0$を満たすものは$\lambda_i=0(i=1, ..., n)$のみである。
+\end{itemize}
+\end{tcolorbox}\par
+ベクトルの組$(\bm v_1, ..., \bm v_n)$が線形独立である場合、いずれの$\bm v_i(i=1, ..., n)$もゼロベクトルではない。仮に$\bm v_j$がゼロベクトルであった場合、スカラー$\lambda_j$の値は$\lambda_i\bm v_i$の結果に影響を与えなくなる。また、$(\bm v_1, ..., \bm v_n)$は相異なる。これも線形独立の条件より明らかであろう。
+\begin{itembox}[l]{定理1.1.2}
+　$K$上のベクトル空間と、線形独立なベクトルの組$(\bm v_1, ..., \bm v_n)$を考える。このとき任意の$s(1\leq s \leq n)$について$(\bm v_1, ..., \bm v_s)$も線形独立なベクトルの組である。
+\end{itembox}
+{\bf 証明：}$(\bm v_1, ..., \bm v_s)$について$\sum_{i=1}^s \lambda_i\bm v_i=\bm 0$が成り立つとする。このとき$\sum_{i=1}^s\lambda_i\bm v_i + 0\bm v_{s+1}+...0\bm v_n=\bm 0$であり、$(\bm v_1, ..., \bm v_n)$は線形独立であるため$\lambda_i=0(i=1, ..., s)$でなければならない。従って本命題は正しい。\qed
+\begin{tcolorbox}[title=基底]
+　$K$上のベクトル空間$V$について、$V$のベクトルの組$(\bm v_1, ..., \bm v_n)$が以下の条件を満たすとき、集合$S=\{ \bm v_1, ..., \bm v_n \}$は$V$の基底であると言う。
+\begin{itemize}
+\item $(\bm v_1, ..., \bm v_n)$は線形独立。
+\item $<\bm v_1, ..., \bm v_n>=V$。
+\end{itemize}
+\end{tcolorbox}\par
+$K$上のベクトル空間は必ず基底を有するが、この証明は難しいので本資料では取り扱わない。
+\begin{itembox}[l]{定理1.1.3}
+　$K$上のベクトル空間$V$の部分集合$S=\{ \bm v_1, ..., \bm v_n \}$は$V$の基底であるとする。このとき、任意のベクトル$\bm x \in V$は$\bm x=\lambda_i\bm v_i$で表すことができ、かつ$\lambda_i(i=1, ..., n)$は一意に決まる。
+\end{itembox}
+{\bf 証明：}$<\bm v_1, ..., \bm v_n>=V$より、任意の$\bm x$が$(\bm v_1, ..., \bm v_n)$の線形結合で表されることは明らか。そこで、$\bm x \in V$が$\bm x=\lambda_i\bm v_i$並びに$\bm x=\lambda'_i \bm v_i$の2通りで書き表したとする。このとき$\bm x-\bm x=(\lambda_i-\lambda'_i)\bm v_i=\bm 0$であるが、線形独立ゆえに$\lambda_i=\lambda'_i$でなければならない。従って本定理は正しい。\qed \par
+$K$上のベクトル空間$V$が有限個のベクトルから成る基底$(\bm v_1, ..., \bm v_n)$を有するとき、$V$は有限次元であると言う。
+\begin{itembox}[l]{補題1.1}
+　$r$は正の整数であるとする。$r$個の$\bm 0$でないベクトル$(\bm v_1, ..., \bm v_r)$に対して$<\bm v_1, ..., \bm v_r>$を考える。$<\bm v_1, ..., \bm v_r>$から$(r+1)$個のベクトルを取ったとき、そのベクトルの組は線形従属である。
+\end{itembox}
+\begin{itembox}[l]{定理1.1.4}
+　$V$は$K$上のベクトル空間であるとする。このとき、$V$の基底を成すベクトルの個数は基底の取り方に依らず一定である。このベクトルの個数を$V$の次元と言い、${\rm dim}V$と書く。
+\end{itembox}
+\begin{itembox}[l]{定理1.1.5}
+　$V$は$K$上のベクトル空間であるとする。$W$は$V$の部分空間であるとし、$W$の部分集合$T$は$W$の基底であるとする。このとき、$V$の基底$S$であって$T$を含むものが存在する。
+\end{itembox}
+\begin{itembox}[l]{定理1.1.6}
+　$V$は$K$上のベクトル空間であるとする。このとき$V$の部分空間$W$について${\rm dim}W \leq {\rm dim}V$が成立し、等号成立は$W=V$に限る。
+\end{itembox}
+\begin{itembox}[l]{系1.1.2}
+　$K$上の$n$次元ベクトル空間$V$と部分集合$S=\{ \bm v_1, ..., \bm v_n \}$を考える。このとき、以下の条件は同値である。
+\begin{itemize}
+\item $S$は線形独立である。
+\item $V=<S>$。
+\item $S$は$V$の基底である。
+\end{itemize}
+\end{itembox}
+\subsubsection{部分空間の和と直和}
+\begin{tcolorbox}[title=部分空間の和]
+　$W_1, ..., W_r$はベクトル空間$V$の部分空間であるとする。ベクトル$\bm v \in V$であって、$\bm v = \sum \bm w_i (\bm w_i \in W_i)$を満たす$\bm w_i(i=1, ..., n)$が存在するとき、$\bm v$全体の集合を部分空間$(W_1, ..., W_r)$の和と言い、$W_1 + ... + W_r$(もしくは$\sum W_i$)と書き表す。
+\end{tcolorbox}
+\begin{itembox}[l]{定理1.1.7}
+　部分空間の和$\sum W_i$は$V$の部分空間である。
+\end{itembox}
+{\bf 証明：}$\bm a, \bm b \in \sum W_i$に対して、それぞれ$\bm a=\sum \bm w_i, \bm a=\sum \bm w'_i$のように表されるとする($\bm w_i, \bm w'_i \in W_i$)。このとき、$\bm a+\bm b = \sum (\bm w_i+\bm w'_i) \in \sum W_i$、$\lambda \bm a = \sum (\lambda \bm w_i) \in \sum W_i$が成立するため、本命題は正しい。\qed
+\begin{itembox}[l]{定理1.1.8}
+　$W_1, ..., W_r$がベクトル空間$V$の部分空間であるとき、${\rm dim}(\sum W_i) \leq \sum {\rm dim}W_i$が成立する。
+\end{itembox}\par
+この定理の直感的解釈を紹介する。まず、ベクトル空間$V$の次元数を$n$とし、基底として$S=\{ \bm v_1, ..., \bm v_n \}$があり、そのうち$W_i(i=1,...,r)$のいずれかに含まれるベクトルの集合を$S'=\{\bm v_1, ..., \bm v_m \}$とする。この場合、当然ながら${\rm dim}(\sum W_i)=m$となる。一方で例えば$\bm v_i$が$W_i$と$W_j$の両方に含まれることもある。つまり、基底を成すベクトルを相異なる部分空間で共有していることもあり、この場合$\sum {\rm dim}W_i > m$の計算では$\bm v_i$が重複してカウントされるため、本定理の不等式が成り立つ。
+\begin{tcolorbox}[title=直和]
+　$W_1, ..., W_r$はベクトル空間$V$の部分空間であるとする。部分空間の和$\sum W_i$が直和であるとは、次の条件が成り立つときに言う。
+\begin{itemize}
+\item ベクトル$\bm w_i \in W_i(i=1, ..., r)$について$\sum w_i=\bm 0$が成り立つならば、$\bm w_i=\bm 0(i=1, ..., r)$である。
+\end{itemize}
+\end{tcolorbox}\par
+部分空間の和が直和であるとき、$W_1+...+W_r$の代わりに$W_1 \oplus ... \oplus W_r$と書く。\par
+直和である場合、$W_i$間で同じ基底ベクトルを共有しない。もしも$W_i$と$W_j$の間で何か基底ベクトルを共有している場合、$\bm w_i+\bm w_j$において相殺することが可能となるためである。従って${\rm dim}(W_1 \oplus ... \oplus W_r)=\sum {\rm dim}W_i$が成立する。このように考えれば、以下の系は自明である。
+\begin{itembox}[l]{系1.1.3}
+　$r$を2以上の整数とし、ベクトル空間$V$の$\{ \bm 0\}$でない部分空間の和$\sum W_i$は直和であるとする。$W_i(i=1, ..., r)$の基底を$S_i$としたとき、$\bigcup S_i$は$\sum W_i$の基底である。
+\end{itembox}
+\begin{itembox}[l]{定理1.1.9}
+　$V$は$K$上のベクトル空間であるとする。$V$の部分空間$W$に対して、$V=W \oplus W'$を満たす、$V$の部分空間$W'$が存在する。このような部分空間を$W$の補部分空間と言う。
+\end{itembox}\par
+部分空間に対して補部分空間は一意に定まらない。例えば2次元ベクトル空間$K^2$に対して、$W$は$\{ \bm e_1\}$が張るベクトル空間とする。このとき、$\{ \bm e_2\}$が張るベクトル空間は$W$の補部分空間であるが、同様に$\{ \bm e_2, \bm e_1+\bm e_2 \}$が張るベクトル空間も$W$の補部分空間と言える。\par
+$K$上のベクトル空間$V$が$r$個の部分空間$W_1, ..., W_r$の直和として表されるとする。このような$W_i(i=1, ..., r)$を見出すことを直和分解と言い、各部分空間$W_i$を直和因子と言う。
+\begin{itembox}[l]{定理1.1.10}
+　$K$上のベクトル空間$V$は直和分解$W_1 \oplus ... \oplus W_r$を持つとする。このとき、任意の$\bm v \in V$に対して$\bm v=\sum \bm w_i$を満たす$\bm w_i(\in W_i)$がただ一通りに定まる。
+\end{itembox}
+{\bf 証明：}定義より、$\bm v=\sum \bm w_i$を満たすベクトルの組$(\bm w_1, ..., \bm w_r)$は少なくとも一つは存在する。$\bm v$が$\sum \bm w_i$と$\sum \bm w'_i$の二通りの表現方法があるとする。このとき、$\sum (\bm w_i - \bm w'_i)=\bm 0$で$(\bm w_i - \bm w'_i) \in W_i$であるが、直和の定義より$\bm w_i - \bm w'_i=\bm 0$でなければならない。従って本定理は正しい。\qed
+\subsection{線形写像}
+\subsubsection{写像}
+$X$と$Y$は空でない集合であるとする。$X$の要素それぞれに対して、$Y$の要素を一つ対応させる対応関係を、$X$から$Y$への写像と言う。$f$が$X$から$Y$への写像であることを$f:X \to Y$と表す。\par
+写像$f_1:X \to Y$と$f_2:X \to Y$について、任意の$x \ in X$に対し$f_1(x)=f_2(x)$であるとき、両写像は等しいと言い、$f_1=f_2$と書く。\par
+全ての要素$x \in X$に対し、$f(x)=x$となるような写像$f:X \to X$のことを$X$上の恒等写像と言う。本資料では恒等写像を$1_X$と書くことにする。\par
+写像$f:X \to Y$と$g:Y \to Z$を考える。このとき、任意の$x \in X$に対する写像の結果$f(x) \in Y$は、更に$g$によって写像することができる。この場合、$g(f(x))$が得られる訳だが、一般的には$g \circ f(x)$と書くことの方が多い。この$g \circ f:X \to Z$のことを$f$と$g$の合成写像と言う。明らかに合成写像について$(h \circ g)\circ f=h\circ (g \circ f)$が成立する。そのため、3つ以上の合成写像に対してわざわざ括弧で囲むようなことはせず、単に$f_n \circ f_{n-1} \circ ... \circ f_1$のように書き表す。
+\begin{tcolorbox}[title=単射、全射]
+　写像$f:X \to Y$について考える。
+\begin{itemize}
+\item $f(x)=f(x')$ならば$x=x'$であるとき、$f$は単射であると言う。
+\item 任意の$y \in Y$に対して、$y=f(x)$を満たす$x \in X$が存在する場合、$f$は全射であると言う。
+\item 単射かつ全射であることを全単射と言う。
+\end{itemize}
+\end{tcolorbox}\par
+明らかに恒等写像は全単射である。
+\begin{itembox}[l]{定理1.2.1}
+　写像$f:X \to Y$と$g:Y \to Z$の合成写像について、以下のことが成り立つ。
+\begin{enumerate}
+\item $f$と$g$が単射ならば$g \circ f$も単射である。
+\item $f$と$g$が全射ならば$g \circ f$も全射である。
+\end{enumerate}
+\end{itembox}
+{\bf 証明：}\\
+(1)$x, x' \in X$について、$g \circ f(x)=g \circ f(x')$が成り立つとする。このとき$g(f(x))=g(f(x'))$かつ$g$は単射であるため、$f(x)=f(x')$が成り立つ。さらに$f$も単射であるため、$x=x'$が成り立つ。従って(1)は正しい。\\
+(2)$z \in Z$に対して、$z=g(y)$を満たす$y \in Y$が必ず存在する。更に$y=f(x)$を満たす$x \in X$も必ず存在するため、$z=g \circ f(x)$を満たす$x$が必ず存在することになる。従って(2)は正しい。\qed \par
+本命題より明らかに、$f$と$g$が全単射なら$g \circ f$も全単射であることが言える。\par
+写像$f$は全単射であるとする。このとき、任意の$y \in Y$に対して$y=f(x)$を満たす$x \in X$がただ一つ存在する。この対応により、$Y$から$X$への逆向きの写像も定まる。これを$f$の逆写像と言い、$f^{-1}$と書き表す。
+\begin{itembox}[l]{定理1.2.2}
+　$f:X \to Y$と$g: Y \to X$について、$g \circ f=1_X$および$f \circ g=1_X$が成り立つとき、$f$は全単射で$g=f^{-1}$である。
+\end{itembox}
+{\bf 証明：}$x, x' \in X$について$f(x)=f(x')$が成り立つとする。このとき$g(f(x))=1_X(x)=x=g(f(x'))=1_X(x')=x'$が成立するため、$f$は単射である。また、任意の$y \in Y$に対して$g(y) \in X$である。$f(g(y))=y$であるため$f$は全射である。従って$f$は全単射であり、$g=f^{-1}$である。\qed
+\subsubsection{線形写像}
+\begin{tcolorbox}[title=線形写像]
+　$U$と$V$は$K$上のベクトル空間であるとする。写像$f:U \to V$が次の二つの条件を満たすとき、$f$は線形写像であると言う。
+\begin{itemize}
+\item 任意の$\bm x, \bm y \in U$に対して$f(\bm x+\bm y)=f(\bm x)+f(\bm y)$が成立する。
+\item 任意の$\bm x \in U$とスカラー$\lambda \in K$に対して$f(\lambda \bm x)=\lambda f(\bm x)$が成り立つ。
+\end{itemize}
+\end{tcolorbox}\par
+線形写像の中でも特に$f:X \to X$なるものを線形変換と言う。
+\begin{itembox}[l]{命題1.2.1}
+　$U$と$V$は$K$上のベクトル空間であるとする。写像$f:U \to V$が線形写像であるとき、$f(\bm 0)=\bm 0$である。
+\end{itembox}
+{\bf 証明：}$f(\bm 0+\bm 0) = 2f(\bm 0)=f(\bm 0)$より明らか。\qed
+\begin{itembox}[l]{定理1.2.3}
+　$f:U \to V$と$g:V \to W$が線形写像であるとき、$g \circ f$も線形写像である。
+\end{itembox}
+{\bf 証明：}$\bm x, \bm y \in U$に対し、$g \circ f(\bm x+\bm y)=g(f(\bm x)+f(\bm y))=g \circ f(\bm x)+g \circ f(\bm y)$が成立する。同様に$\lambda \in K$に対して$g\circ f(\lambda \bm x)=g(\lambda f(\bm x))=\lambda(g \circ f)(\bm x)$が成立する。従って本命題は正しい。\qed
+\begin{itembox}[l]{定理1.2.4}
+　線形写像$f:U \to V$が全単射であるとき、$f^{-1}:V \to U$も線形写像である。
+\end{itembox}
+{\bf 証明：}任意の$\bm x, \bm y \in V$に対して$f^{-1}(\bm x)=\bm a$および$f^{-1}(\bm y)=\bm b$を満たす$\bm a, \bm b \in U$がただ一つ存在する。また、明らかに$\bm x=f(\bm a)$および$\bm y=f(\bm b)$である。$f$の線形性より$\bm x+\bm y=f(\bm a+\bm b)$であるため、$\bm a+\bm b=f^{-1}(\bm x+\bm y)=f^{-1}(\bm x)+f^{-1}(\bm y)$が最終的に得られる。同様にスカラー倍に対しての条件も$f^{-1}$は満たす。よって本命題は正しい。\qed
+\begin{tcolorbox}[title=核と像]
+　$U$と$V$は$K$上のベクトル空間であるとする。写像$f:U \to V$を考える。
+\begin{itemize}
+\item $U$の部分集合${\rm Ker}f=\{ \bm x \in U | f(\bm x)=\bm 0_V \}$を$f$の核と言う。
+\item $V$の部分集合${\rm Im}f=\{ \bm y \in V| \bm y =f(\bm x)を満たす\bm x \in Uが存在する\}$を$f$の像と言う。
+\end{itemize}
+\end{tcolorbox}
+\begin{itembox}[l]{定理1.2.5}
+　$U$と$V$は$K$上のベクトル空間であるとする。$f:U \to V$が線形写像であるとき、
+\begin{enumerate}
+\item ${\rm Ker}f$は$U$の部分空間である。
+\item ${\rm Im}f$は$V$の部分空間である。
+\end{enumerate}
+\end{itembox}
+{\bf 証明：}\\
+(1)$\bm x, \bm y \in {\rm Ker}f$に対し、$f(\bm x+\bm y)=\bm 0$であること、並びに$\lambda \in K$に対して$f(\lambda \bm x)=\bm 0$であることから明らか。\\
+(2)ベクトル$\bm v, \bm w \in {\rm Im}f$を考える。このとき$\bm v=f(\bm a)$および$\bm w=f(\bm b)$を満たす$\bm a, \bm b \in U$が存在する。$\bm v+\bm w=f(\bm a+\bm b)$で$\bm a+\bm b \in U$なので、$\bm v + \bm w \in {\rm Im}f$である。スカラー倍についても同様。\qed
+\begin{itembox}[l]{系1.2.1}
+　$f:U \to V$が線形写像であるとき、$f$が単射であることと${\rm Ker}f=\{ \bm 0_U \}$であることは同値である。
+\end{itembox}\par
+$K$上のベクトル空間$U, V$と線形写像$f:U \to V, g:U \to V$を考える。線形写像の和とスカラー倍を
+\begin{equation}
+(f+g)(\bm x)=f(\bm x)+g(\bm x),~~~(\lambda f)(\bm x)=\lambda f(\bm x) \notag
+\end{equation}
+と定めたとき、明らかに線形写像の和とスカラー倍も線形写像である。また、任意の$\bm u \in U$に対して$f(\bm u)=\bm 0_V$となる写像をゼロ写像と言う。ゼロ写像も明らかに線形写像である。\par
+以下は線形写像における重要なベクトル空間である。
+\begin{itembox}[l]{定理1.2.6}
+　$U$と$V$は$K$上のベクトル空間であるとする。$U$から$V$への線形写像が成す集合を${\rm Hom}_K(U, V)$と書く。和とスカラー倍が前述のように定められたとき、ゼロ写像をゼロベクトルだと見なせば、${\rm Hom}_K(U, V)$は$K$上のベクトル空間である。
+\end{itembox}\par
+ベクトル空間$V$が直和分解$V=W_1 \oplus ... \oplus W_r$を持つとする。定理1.10より、任意の$\bm v \in V$に対して$\bm v=\sum \bm w_i$を満たす$\bm w_i(\in W_i)$がただ一通りに定まる。そこで、$V$から$V$への写像$p_i$を
+\begin{equation}
+p_i:V \to V, ~~~p_i(\bm v)=\bm w_i \notag
+\end{equation}
+のように定義する。このとき$\bm v$は
+\begin{equation}
+\bm v=\sum p_i(\bm v) \notag
+\end{equation}
+のように書き表すことができる。このような写像$p_i$を$V$から$W_i$への射影と呼ぶ。
+\begin{itembox}[l]{定理1.2.7}
+　$V$は$K$上のベクトル空間であるとし、$p_i(i=1, ..., r)$は直和分解$V=W_1 \oplus ... \oplus W_r$から定まる、$V$から$W_i$への射影だとする。このとき、以下のことが成り立つ。
+\begin{enumerate}
+\item $p_i(i=1, ..., r)$は線形写像である。
+\item ${\rm Im}p_i=W_i$である。
+\item $p_i \circ p_i=p_i$である。
+\item $p_i \circ p_j$はゼロ写像である。
+\item $p_1+...p_r=1_V$である。
+\end{enumerate}
+\end{itembox}
+{\bf 証明：}\\
+(1)ベクトル$\bm x, \bm y \in V$について、
+\begin{equation}
+\bm x+\bm y=\sum \left\{p_i(\bm x)+p_i(\bm y)\right\} \notag
+\end{equation}
+が成り立つ。$p_i(\bm x),p_i(\bm y) \in W_i$かつ$p_i(\bm x)+p_i(\bm y) \in W_i$である。従って射影の定義から$p(\bm x+\bm y)=p(\bm x)+p(\bm y)$が成り立つ。スカラー倍に関しても同様。\\
+(2)射影の定義より、${\rm Im}p_i \subset W_i$であることは明らか。$\bm w_i \in V$が$\bm w_i \in W_i$でもある場合、$p_i(\bm w_i)=\bm w_i$が任意の$\bm w_i \in W_i$で成り立つ。従って$W_i {\rm Im}p_i$であるから、${\rm Im}p_i=W_i$を最終的に得る。
+(3)(4)(5)定義より明らか。\qed
+\subsubsection{線形変換}
+繰り返しになるが、$V$が$K$上のベクトル空間であって、$V$から$V$自身への線形写像のことを、特別に$V$の線形変換と言う。定理1.16において、$U=V$の場合を考えれば、$V$上の線形変換のなす集合${\rm Hom}_K(V, V)$は$K$上のベクトル空間になる。一般的に、${\rm Hom}_K(V, V)$のことを${\rm End}_K(V)$と書く。\par
+$V$上の線形変換の合成写像は、再び$V$上の線形変換となる(定理1.13)。線形変換の場合、合成写像を$g \circ f$の代わりに$gf$のように書く。
+\begin{itembox}[l]{系1.2.2}
+ $V$は$K$上のベクトル空間であるとする。$f, g, h$が$V$上の線形変換で、$\lambda$がスカラーのとき、以下の等式が成り立つ。
+\begin{itemize}
+\item $f0_v=0_vf=0_v$
+\item $f1_V=1_vf=f$
+\item $(fg)h=f(gh)$
+\item $f(g+h)=fg+fh,~~(f+g)h=fh+gh$
+\item $\lambda(fg)=f(\lambda g)$
+\end{itemize}
+\end{itembox}\par
+単なる合成写像であるが、系1.5より線形変換には積が定義されていると見なせる。そこで、線形変換$f$と整数$n$に対して、$f^n=ff...f$と定める(右辺の$f$は$n$個)。ここから更に拡張して、多項式に線形変換を代入する操作を以下のように定義する。
+\begin{tcolorbox}[title=線形変換の多項式への代入]
+　$V$は$K$上のベクトル空間とし、$f$は$V$上の線形変換であるとする。$K$係数の多項式
+\begin{equation}
+P(x)=c_dx^d+c_{d-1}x^{d-1}...+c_1x+c_0 \notag
+\end{equation}
+に対して、$V$上の線形変換$P(f)$を以下のように定める。
+\begin{equation}
+P(f)=c_df^d+c_{d-1}f^{d-1}...+c_1f+c_0 \notag
+\end{equation}
+\end{tcolorbox}
+\begin{itembox}[l]{定理1.2.8}
+$V$は$K$上のベクトル空間であるとし、$f$は$V$上の線形変換であるとする。$K$係数の多項式$P(x), Q(x)$に対し、$S(x)=P(x)+Q(x)$、$T(x)=P(x)Q(x)$とおくと、以下の等式が成立する。
+\begin{equation}
+S(f)=P(f)+Q(f),~~~T(f)=P(f)Q(f) \notag
+\end{equation}
+\end{itembox}
+\begin{itembox}[l]{定理1.2.9}
+$P(x), Q(x)$は$K$係数の多項式で、$f$は$K$上のベクトル空間$V$上の線形変換である。このとき、線形変換$P(f)$と$Q(f)$は可換である。
+\end{itembox}
+{\bf 証明：}$P(f)Q(f)=Q(f)P(f)$より明らか。
+
+\subsection{固有値と固有ベクトル}
+\begin{tcolorbox}[title=不変部分空間]
+　$V$は$K$上のベクトル空間であるとし、$f$は$V$上の線形変換であるとする。$V$の部分空間について、任意の$\bm w \in W$が$f(\bm w) \in W$を満たすとき、$W$は$f$に関して不変(もしくは$f-$不変)と言う。
+\end{tcolorbox}
+\begin{tcolorbox}[title=固有値と固有ベクトル]
+　$V$は$K$上のベクトル空間とし、写像$f:V \to V$は$V$上の線形変換であるとする。スカラー$\alpha$についてゼロベクトルでないベクトル$\bm v \in V$であって$f(\bm v)=\alpha \bm v$を満たす$\bm v$が存在するとき、$\alpha$を$f$の固有値と言う。また、このときの$\bm v$を$\alpha$に対する$f$の固有ベクトルと言う。
+\end{tcolorbox}
+線形変換$f$の固有値$\alpha$と固有ベクトル$\bm v$を考える。このときゼロでない任意のスカラー$\lambda \in K$に対して$\lambda \bm v$も$\alpha$に対する固有ベクトルである。従って一つの固有値に対して一つの固有ベクトルが定まる訳ではない。一般的に固有ベクトルと聞くと、単位ベクトルのものを想像する。
+\begin{itembox}[l]{定理1.3.1}
+　$V$は$K$上のベクトル空間であるとし、$f$は$V$上の線形変換であるとする。$f$の固有値$\alpha$に対し、$V$の部分集合$W(\alpha)=\{ \bm v \in V|f(\bm v)=\alpha \bm v \}$を定義する。この$W(\alpha)$は$f-$不変な部分空間である。このような部分空間を$\alpha$に対する固有空間と言う。
+\end{itembox}
+{\bf 証明：}任意のベクトル$\bm u, \bm v \in W(\alpha)$に対し、$f(\bm u+\bm v)=f(\bm u)+f(\bm v)=\alpha(\bm u+\bm v) \in W(\alpha)$である。また任意のスカラー$\lambda$に対して$\lambda \bm u \in W(\alpha)$が成立する。従って$W(\alpha)$は部分空間である。また、$f-$不変な部分空間であることは定義より明らかなので、本定理は正しい。\qed \par
+固有値の定義から、$W(\alpha) \neq \{ \bm 0\}$であることと$\alpha$が固有値であることは同値である。また、$f(\bm v)=\alpha \bm v$は$(\alpha 1_v-f)(\bm v)=\bm 0$とも書き表せるから、$W(\alpha)={\rm Ker}(\alpha 1_V-f)$であることにも注意する。
+\begin{itembox}[l]{命題1.3.2}
+　$V$は$K$上のベクトル空間であるとし、$f$は$V$上の線形変換であるとする。互いに異なる固有値に対応する固有ベクトルの組$(\bm v_1, ..., \bm v_n)$は線形独立である。
+\end{itembox}
+{\bf 証明：}$n=1$のとき、定義より固有ベクトルはゼロベクトルでないので、本命題は正しい。$n=k$のとき正しいと仮定する。$n=k+1$のとき、$\sum={i=1}^n \lambda_i\bm v_i=\bm 0$だとする。両辺に対し$f$を作用させると、$\sum \lambda_i\alpha_i\bm v_i=\bm 0$を得る。ここで$\alpha_i$はそれぞれの固有値である。$\sum={i=1}^n \lambda_i\bm v_i$を$\alpha_{k+1}$でスカラー倍し、前述の式の両辺から引くと
+\begin{equation}
+\sum_{i=1}^k\lambda_i(\alpha_i-\alpha_{k+1})\bm v_i=\bm 0 \notag
+\end{equation}
+を得る。いま$(\bm v_i, ..., \bm v_k)$は線形独立であり、各固有値は異なる値であるため、上式より$\lambda_i=0(i=0, ..., k)$だと解る。よって$\bm v_{k+1} \neq 0$より$\lambda_{k+1}$もゼロになる。以上より本命題は正しい。\qed
+\begin{itembox}[l]{定理1.3.3}
+　$f$は$K$上のベクトル空間$V$上の線形変換であるとし、$P(x)$は$x$を変数とする$K$係数の多項式であるとする。$\bm v$が$f$の固有空間$W(\alpha)$に属するベクトルであるとき、$P(f)(\bm x)=P(\alpha)\bm v$が成り立つ。
+\end{itembox}
+
+\subsection{内積空間}
+\begin{tcolorbox}[title=内積空間]
+　$V$は$K$上のベクトル空間であるとする。$V$のすべてのベクトルの組$\bm x, \bm y$に対して$K$の要素$(\bm x, \bm y)$が定まり、以下の条件が成り立っているとき、$V$は$K$上の内積空間(もしくは計量ベクトル空間)であると言う。さらにこのとき、$(\bm x, \bm y)$の値を$\bm x$と$\bm y$の内積と言う。
+\begin{itemize}
+\item $(\bm x+\bm y, \bm z)=(\bm x, \bm z)+(\bm y, \bm z),~~~(\bm x, \bm y+\bm z)=(\bm x, \bm y)+(\bm x, \bm z)$
+\item $(\lambda\bm x, \bm y)=\overline{\lambda}(\bm x, \bm y),~~~(\bm x, \lambda\bm y)=\lambda(\bm x, \bm y)$
+\item $(\bm x, \bm y)=\overline{(\bm y, \bm x)}$
+\item $(\bm x, \bm x) \geq 0$。等号成立は$\bm x=\bm 0$のときのみ。
+\end{itemize}
+\end{tcolorbox}
+内積空間において、$(\bm x, \bm y)=0$のとき、$\bm x$と$\bm y$は直交すると言う。また、内積の条件より、$(\bm x, \bm x)$はゼロ以上の実数であるから、$|| \bm x ||=\sqrt{(\bm x, \bm x)}$によって、ゼロ以上の実数が定まる。この値を$\bm x$のノルムと呼ぶ。当然ながら、ノルムがゼロとなるのは$\bm x=\bm 0$のときのみである。
+\begin{itembox}[l]{定理1.4.1}
+　$V$は$K$上の内積空間であるとする。このとき、任意の$\bm x, \bm y \in V$について、以下の不等式が成り立つ。
+\begin{itemize}
+\item $|(\bm x, \bm y)| \leq ||\bm x||||\bm y||$。Cauchy-Schwarzの不等式。
+\item $||\bm x+\bm y|| \leq ||\bm x|| + ||\bm y||$。三角不等式。
+\end{itemize}
+\end{itembox}
+\begin{tcolorbox}[title=正規直交系]
+　$V$は$K$上の内積空間であるとする。$V$の空でない部分集合$S$について次の二つが成り立つとき、$S$は正規直交系であると言う。
+\begin{itemize}
+\item 任意の$\bm x \in S$について、$(\bm x, \bm x)=1$である。
+\item 相異なる任意のベクトルの組$\bm x, \bm y \in S$について、$(\bm x, \bm y)= 0$である。
+\end{itemize}
+\end{tcolorbox}\par
+明らかに正規直交系は線形独立である。$V$の基底$S$が正規直交系でもある場合、$S$は$V$の正規直交基底であると言う。有限次元のベクトル空間に基底が必ず存在するように、有限次元の内積空間には必ず正規直交基底が存在する。
+\begin{itembox}[l]{定理1.4.2}
+　$V$は$K$上の$n$次元ベクトル空間であるとする。集合$S=\{ \bm b_1, ..., \bm b_n \}$が$V$の正規直交基底であるとき、任意の$\bm x \in V$に対して$\bm x=\sum (\bm b_i, \bm x)\bm b_i$が成立する。
+\end{itembox}
+{\bf 証明：}定義より、任意の$\bm x \in V$は$\bm x=\sum \lambda_i \bm b_i$のように表すことができる。$(\bm b_i, \bm x)=\lambda_i$より、本定理は正しい。\qed
+\begin{itembox}[l]{定理1.4.3}
+　$V$は$K$上の内積空間であるとし、$S=\{\bm b_1, ..., \bm b_n\}$は$V$の正規直交系であるとする。このとき、任意の$\bm x \in V$について$\sum|(\bm b_i, \bm x)|^2 \leq ||\bm x||^2$が成り立つ。これをベッセルの不等式と言う。また、$S$が正規直交基底であるときに限り、等号が成立する。
+\end{itembox}
+{\bf 証明：}$\bm x \in V$に対して$\bm y=\bm x-\sum(\bm b_i, \bm x)\bm b_i$を定める。このとき
+\begin{equation}
+||\bm y||^2=||\bm x||^2-\sum \overline{(\bm b_i, \bm x)}(\bm b_i, \bm x)-\sum (\bm b_i, \bm x)(\bm x, \bm b_i)+\sum_i\sum_j\overline{(\bm b_i, \bm x)}(\bm b_j, \bm x)(\bm b_i, \bm b_j) \notag
+\end{equation}
+となるが、内積と正規直交系の定義より、$||\bm y||^2=||\bm x||^2-\sum|(\bm b_i, \bm x)|^2$だと分かる。$||\bm y||^2 \geq 0$であるため、ベッセルの不等式は正しい。また、$S$が正規直交基底であるときは$\bm y=\bm 0$であるため、等号成立に関しても正しい。\qed
+
+\subsection{双対空間}
+\begin{tcolorbox}[title=双対空間]
+　$V$は$K$上のベクトル空間であるとする。$V$から$K$への線形写像全体のなすベクトル空間${\rm Hom}_K(V, K)$を、$V$の双対空間と言い、$V^*$で書き表す。
+\end{tcolorbox}
+\begin{itembox}[l]{定理1.5.1}
+　$V$は$K$上の$\{ \bm 0 \}$でない有限次元ベクトル空間であるとする。$V$の次元を$n$とし、$S=\{ \bm v_1, ..., \bm v_n\}$は$V$の基底であるとする。このとき、$V^*$の要素$\phi_1, ..., \phi_n$であって、$\phi_k(\bm v_j)=\delta_{jk}$を満たすものがただ一通りに定まる。
+\end{itembox}
+{\bf 証明：}まず、このような$\phi_k$が存在することを証明する。任意のベクトル$\bm x \in V$はスカラー$\lambda_j$を用いて$\bm x=\lambda_j\bm v_j$のようにただ一通りに表現できる。そこで$k=1, ..., n$において$\bm x$に$\lambda_k$を対応させる写像を$\phi_k$とする。すなわち、
+\begin{equation}
+\phi_k:V \to K,~~~\phi_k(\sum \lambda_j \bm v_j)=\lambda_k \notag
+\end{equation}
+を考える。この写像$\phi_1, ..., \phi_n$は$\phi_k(\bm v_j)=\delta_{jk}$を満たす。また、$\bm x$は$\bm x=\sum \phi_j(\bm x)\bm v_j$と書き表せるようになる。\par
+そこで、$\bm a, \bm b \in V$なるベクトルを考える。これは$\bm a+\bm b=\sum\{\phi_k(\bm a)+\phi_k(b)\}\bm v_k$を満たす。よって$\phi_k$の定義から$\phi_k(\bm a+\bm b)=\phi(\bm a)+\phi(\bm b)$を満たす。スカラー倍についても同様である。よって条件を満たす線形写像$\phi_k$は存在する。\par
+次にこれがただ一通りに定まることを示す。$\phi_k$と$\phi'_k$が条件を満たすと仮定する。このとき、任意のベクトル$\bm x=\sum \lambda_j \bm v_j \in V$において、$\phi_k(\bm x)=\lambda_k$かつ$\phi'_k(\bm x)=\lambda_k$が成立する。従って$\phi_k=\phi'_k$である。以上より、本定理は正しい。\qed
+\begin{itembox}[l]{定理1.5.2}
+　定理1.25で定めた$\phi_k$について、$S^\vee =(\phi_1, ..., \phi_n)$は$V^*$の基底である。これを特別に双対基底と言う。
+\end{itembox}
+{\bf 証明：}まず初めに$S^\vee$が線形独立であることを証明する。スカラー$\lambda_k$について$\sum \lambda_k\phi_k=0_{V^*}$が成り立つとする。このとき、任意の$\bm x \in V$に対して$(\sum \lambda_k\phi_k)(\bm x)=0$であるが、$\phi_k$の線形性より$\sum \lambda_k\phi_k(\bm x)=0$と書き直すことができる。$V$の基底として$(\bm v_1, ..., \bm v_n)$を考えるとき、$\bm x=\bm v_j$とすれば、$\sum \lambda_k\phi_k(\bm v_j)=\lambda_j$となる。従って任意の$j(j=1, ..., n)$に対して$\lambda_j=0$であるため、$S^\vee$は線形独立である。\par
+次に$S^\vee$が$V^*$を張ることを証明する。そこで、任意の$\psi \in V^*$が$\psi=\sum \psi(\bm v_k)\phi_k$で表されることを示す。この等式は$V^*$におけるものであるから、任意の$\bm x \in V$において$\psi(\bm x)=\{ \sum \psi(\bm v_k)\phi_k\}(\bm x)$であることを示せばよい。$\bm x=\sum \phi_k(\bm x)\bm v_k$より、
+\begin{equation}
+\psi(\bm x)=\psi \left( \sum \phi_k(\bm x)\bm v_k \right)=\sum \phi_k(\bm x)\psi(\bm v_k) \notag
+\end{equation}
+が成り立つ。ここで$\phi_k(\bm x)$と$\psi(\bm v_k)$はスカラーなので可換である。そのため、上式の右辺は
+\begin{equation}
+\sum \phi_k(\bm x)\psi(\bm v_k)=\left(\sum \psi(\bm v_k)\phi_k \right)(\bm x) \notag
+\end{equation}
+と書き直すことができる。これは任意の$\psi \in V^*$について成り立つので、確かに$S^\vee$は$V^*$を張る。\qed \par
+$K$上のベクトル空間について、基底$S=\{ \bm v_1, ..., \bm v_n \}$と双対基底$S^\vee=\{\phi_1, ..., \phi_n \}$を取ったとき、任意の$\bm x \in V$および$\psi \in V^*$が下記のように表記可能であることは有名である(再掲)。
+\begin{equation}
+\bm x=\sum \phi_i(\bm x)\bm v_i,~~\psi=\sum \psi(\bm v_i)\phi_i
+\end{equation}
+\begin{tcolorbox}[title=双対写像]
+　$U, V$は$K$上のベクトル空間であるとし、写像$f:U \to V$は線形写像であるとする。このとき、以下の式を満足する写像$f^\vee: V^* \to U^*$を$f$の双対写像と呼ぶ。
+\begin{equation}
+(f^\vee(\phi))(\bm u)=\phi(f(\bm u))~(\phi \in V^*,~\bm u \in U) \notag
+\end{equation}
+\end{tcolorbox}
+\begin{itembox}[l]{定理1.5.3}
+　双対写像は線形写像である。
+\end{itembox}
+{\bf 証明：}任意の$\phi, \psi \in V^*$と任意の$\bm u \in U$について
+\begin{equation}
+(f^\vee(\phi+\psi))(\bm u)=(\phi+\psi)(f(\bm u))=\phi(f(\bm u))+\psi(f(\bm u)) \notag
+\end{equation}
+が成り立つ。同様に
+\begin{equation}
+(f^\vee(\phi)+f^\vee(\psi))(\bm u)=(f^\vee(\phi))(\bm u)+(f^\vee(\psi))(\bm u)=\phi(f(\bm u))+\psi(f(\bm u)) \notag
+\end{equation}
+が成り立つ。よって$f^\vee(\phi+\psi)=f^\vee(\phi)+f^\vee(\psi)$だと分かる。スカラー倍についても同様ゆえに、確かに双対写像は線形写像である。\qed
+\begin{itembox}[l]{定理1.5.4}
+　$U, V$は$K$上のベクトル空間であるとし、写像$f:U \to V$は線形写像であるとする。$f$と$f$の双対写像$f^\vee:V^* \to U^*$について、次のことが成立する。
+\begin{enumerate}
+\item $f$が単射ならば$f^\vee$は全射。
+\item $f$が全射ならば$f^\vee$は単射。
+\end{enumerate}
+\end{itembox}
+
+\subsection{ベクトル空間の同型}
+\begin{tcolorbox}[title=同型写像と同型]
+　$U$と$V$はともに$K$上のベクトル空間であるとする。
+\begin{itemize}
+\item 線形写像$f:U \to V$が全単射であるとき、$f$は$U$から$V$への同型写像であると言う。
+\item $U$から$V$への同型写像が存在するとき、$U$は$V$と($K$上のベクトル空間として)同型であると言い、$U \simeq V$と表す。
+\end{itemize}
+\end{tcolorbox}\par
+$U$と$V$はベクトル空間であるとし、$f:U \to V$は線形写像であるとする。このとき、$f$は$U$から$V$への写像であるが、$U$から${\rm Im}f$への写像とも見なせる。このようにして定まる写像を$f_0:U \to {\rm Im}f$と置く。このとき、$f_0$は全射であり、任意の$\bm u \in U$について$f(\bm u)=f_0(\bm u)$が成り立つ。したがって、もし$f$が単射であるなら、$f_0$は全単射となる。つまり、ベクトル空間$U$は単射$f:U \to V$によって$U \simeq {\rm Im}f$となる。
+\begin{itembox}[l]{系1.6.1}
+　$U, V, W$は$K$上のベクトル空間であるとする。このとき、次のことが成立する。
+\begin{itemize}
+\item $U \simeq U$。
+\item $U \simeq V$ならば$V \simeq U$。
+\item $U \simeq V$かつ$V \simeq W$ならば$U \simeq W$。
+\end{itemize}
+\end{itembox}\par
+以上より、$\simeq$は同値関係である。
+\begin{itembox}[l]{系1.6.2}
+　$V$は$\{ \bm 0 \}$でない$K$上の有限次元ベクトル空間であり、${\rm dim}V=n$とする。このとき、$V \simeq K^n$である。
+\end{itembox}
+\begin{itembox}[l]{系1.6.3}
+ $U$と$V$が同型であることと、$U$と$V$の次元が等しいことは同値である。
+\end{itembox}
+\begin{itembox}[l]{系1.6.4}
+　$U, V, W$は$K$上のベクトル空間であり、$f:U \to V$と$g:V \to W$は線形写像であるとする。
+\begin{itemize}
+\item $f$が全射であるとき、${\rm Im}(g \to f)={\rm Im}g$である。
+\item $g$が単射であるとき、${\rm Im}(g \to f) \simeq {\rm Im}f$である。
+\end{itemize}
+\end{itembox}
+
+\subsection{商空間と準同型定理}
+\begin{itembox}[l]{命題1.7.1}
+　$V$は$K$上のベクトル空間であるとし、$W$は$V$の部分空間であるとする。$V$のベクトル$\bm x$と$\bm y$について、$\bm x-\bm y \in W$であることを$\bm x \sim_W\bm y$と表すことにする。このとき、$V$上の2項関係$\sim_W$は同値関係である。
+\end{itembox}
+{\bf 証明：}2項関係の反射率、対称律、推移率を調べればよい。まず、$\bm x-\bm x=\bm 0 \in W$であるので、反射率を満たす。また、$\bm x-\bm y \in W$なら$\bm y-\bm x \in W$なので、対称律も満たす。最後に、$\bm x-\bm y \in W$かつ$\bm y-\bm z \in W$であるとき、$(\bm x-\bm y)+(\bm y-\bm z)=\bm x-\bm z \in W$なので推移率も満たす。よって本命題は正しい。\qed
+
+\begin{tcolorbox}[title=商空間]
+　$V$は$K$上のベクトル空間であるとし、$W$は$V$の部分空間であるとする。命題1.7.1のように同値関係$\sim_W$を定義する。$\sim_W$に関する$V$の商集合を、$V$の$W$による商空間と呼び、$V/W$で表す。
+\end{tcolorbox}
+
+\begin{itembox}[l]{補題1.7.1}
+　$V$を$K$上のベクトル空間とし、$W$を$V$の部分空間であるとする。同値関係$\sim_W$を命題1.7.1のように定め、$\sim_W$に関する$\bm a$の同値類を$[\bm a]$と書き表す。このとき、$[\bm a]=[\bm b]$であることと$\bm a-\bm b \in W$であることは同値である。
+\end{itembox}
+{\bf 証明：}$[\bm a]=[\bm b]$であるとする。このとき$\bm b$は$\bm b \in [\bm a]$かつ$\bm b \in [\bm b]$であるから、$\bm a-\bm b \in W$が成り立つ。逆に$\bm a-\bm b \in W$であるとする。任意の$\bm a' \in [\bm a]$について$\bm a'-\bm a \in W$なので$\bm a'-\bm b \in W$。よって、$\bm a' \in [\bm b]$である。逆も然りなので$[\bm a]=[\bm b]$だと解る。\qed
+\begin{itembox}[l]{補題1.7.2}
+　$\bm a, \bm b, \bm x, \bm y \in V$であり、$\lambda \in K$であるとする。$[\bm a]=[\bm x]$かつ$[\bm b]=[\bm y]$であるとき、以下のことが成り立つ。
+\begin{enumerate}
+\item $[\bm a+\bm b]=[\bm x+\bm y]$
+\item $[\lambda \bm a]=[\lambda \bm x]$
+\end{enumerate}
+\end{itembox}
+{\bf 証明：}定義より、$\bm a-\bm x \in W$かつ$\bm b-\bm y \in W$である。したがって両ベクトルの和についても$(\bm a+\bm b)-(\bm x-\bm y) \in W$が成り立つ。よって補題1.7.1より$[\bm a+\bm b]=[\bm x+\bm y]$である。スカラー倍についても同様に証明できる。\qed \par
+たとえ$[\bm a]=[\bm x]$であったとしても、同値類の定義だけを見れば$\bm a=\bm x$とは限らない。従って補題1.7.2はそれほど自明ではなかった。補題1.7.2は$\sim_W$だからこそ成立するものであり、何か商空間に対する和やスカラー倍の概念を提供してくれる。
+
+\begin{itembox}[l]{定理1.7.1}
+　$V$は$K$上のベクトルであるとし、$W$は$V$の部分空間であるとする。商空間$V/W$上の和と定数倍を
+\begin{equation}
+[\bm a]+[\bm b]=[\bm a+\bm b],~~~\lambda[\bm a]=[\lambda \bm a] \notag
+\end{equation}
+によって定める。$V/W$のゼロベクトルを$\bm 0_{V/W}=[\bm 0_V]$とすれば、$V/W$は$K$上のベクトル空間である。
+\end{itembox}\par
+定義より明らかに$\bm 0_{V/W}=W$である。
+\begin{itembox}[l]{定理1.7.2}
+　$V$は$K$上の$n$次元ベクトル空間であるとし、$W$は$d$次元の$V$の部分空間であるとする。$W$の基底として$S=\{\bm w_1, ..., \bm w_d\}$を考え、$V$の基底$T$を$T\setminus S=\{\bm v_1, ..., \bm v_{n-d}\}$となるように定める。このとき、$S'=\{[\bm v_1], ..., [\bm v_{n-d}]\}$は$V/W$の基底となる。
+\end{itembox}
+{\bf 証明：}まず、$S'$が線形独立であることを示す。いま、$\sum_{i=1}^{n-d} \lambda_i[\bm v_i]=\bm 0_{V/W}$なる等式を考える。左辺は$[\sum \lambda_i \bm v_i]$に等しいので、定理1.7.1より$\sum \lambda_i \bm v_i \in W$となる。$\sum \lambda_i \bm v_i=\sum_{i=1}^d\mu_i \bm w_i$と線形結合で表したとき、$T$は線形独立であるため、$\lambda_i=0(i=0, ..., n-d)$となる。従って、$S'$は線形独立である。\par
+次に$S'$は$V/W$を張ることを示す。ある$\bm v \in V$に対して$[\bm v]$を考える。$\bm v$を$T$の線形結合$\sum_{i=1}^{d}\nu_i\bm w_i+\sum_{i=1}^{n-d}\theta_i\bm v_i$で表す。このとき、$\bm v-\sum_{i=1}^{n-d}\theta_i\bm v_i \in W$であるため、補題1.7.1より$[\bm v]=[\sum_{i=1}^{n-d}\theta_i\bm v_i]$となる。よって、$[\bm v]=\sum \theta_i[\bm v_i]$より、$S'$は$V/W$を張る。\par
+以上より、$S'$は$V/W$の基底である。\qed \par
+本定理より、${\rm dim}(V/W)={\rm dim}V-{\rm dim}W$が成立する。
+\begin{itembox}[l]{定理1.7.3(準同型定理)}
+　$U$と$V$は$K$上のベクトル空間、$f:U \to V$は線形写像であるとする。このとき、$U/{\rm Ker}f \simeq {\rm Im}f$が成り立つ。
+\end{itembox}\par
+本定理と定理1.7.2より、${\rm dim}{\rm Ker}f+{\rm dim}{\rm Im}f={\rm dim}U$が成り立つ。
+
+\section{行列と数ベクトル}
+1章ではベクトル空間と線形写像を中心に置き、抽象的な線形代数を議論した。これに対して本章では、ベクトル空間として数ベクトル空間という具体例を扱う。数ベクトル空間の場合のベクトルは$\bm u=(u_1, ..., u_n)^{\rm T}$のように、$K$上の数値$u_i$を列挙したものである。これら数値の組が矢印のような物を表しているのか、それともフーリエ級数の組を表しているのかは、まだ分からない。そういった意味で、数ベクトルという情報だけでは1章のときと変わらず抽象的である。しかしながら、ベクトルの実態が何であれ、それを「数値を列挙したもの」と定めたならば、線形写像などが代数的処理になり、非常に扱いやすくなる。実際すぐに分かるように、線形写像は行列演算に置き換えられる。\par
+当然ながら、数ベクトル空間や行列を扱うことになっても、線形代数の諸定理の本質は変わらない。それゆえ本章で見られる定理の大半は1章で見た定理が再登場しているに過ぎず、"数ベクトル風"・"行列風"に言い換えたものである。\par
+ただし、実用性を損なわない程度に議論を単純化するために、基底は正規直交基底であることを前提とする。この前提は1章の議論では無かったため、注意していただきたい。
+\subsection{線形写像の行列表示}
+まずは線形写像と行列の関係を議論する。そのために、$K$上の$n$次元数ベクトル空間$U$と$K$上の$m$次元数ベクトル空間$V$を考える。また、$U$の正規直交基底として$S=\{ \bm u_i\}_{i=1}^n$、$V$の正規直交基底として$T=\{ \bm v_i \}_{i=1}^m$を定める。このとき、任意の$\bm u \in U$および$\bm v \in V$は、それぞれ$\bm u=\sum_i a_i\bm u_i$、$\bm v=\sum_j b_j\bm v_j$のように書き表すことができる。\par
+線形写像$f:U \to V$について、$f(\bm u)$は$f$の線形性より$f(\bm u)=\sum_i a_if(\bm u_i)$となる。$f(\bm u_i)$は$V$に属するため、基底を用いて$f(\bm u_i)=\sum F_{ij}\bm v_j$と一意に書き表すことができる。このとき、上式より
+\begin{equation}
+f(\bm u)=\sum_i a_if(\bm u_i)=\sum_i\sum_ja_iF_{ij}\bm v_j \notag
+\end{equation}
+なる関係が得られる。ここで$\bm u=(a_1, ..., a_n)^{\rm T}$、並びに$\bm v=(b_1, ..., b_m)^{\rm T}$と数ベクトルで表記し、$F_{ij}$を成分に持つ行列$F \in K^{m \times n}$を定めたとする。このとき$\bm v=f(\bm u)$だとすれば、上式の関係は
+\begin{equation}
+\bm v=
+\begin{bmatrix}
+b_1 \\ b_2 \\ ... \\ b_m
+\end{bmatrix}
+=F
+\begin{bmatrix}
+a_1 \\ a_2 \\ ... \\ a_n
+\end{bmatrix}
+=F\bm u \notag
+\end{equation}
+のように書き直すことができる。これは線形写像の作用を行列$F$で表したことを意味しており、$F$のことを$f$に対する表現行列と言う。\par
+表現行列の定義より、$F\bm u_i=\sum F_{ij}\bm v_j$であるから、$F_{ij}=(\bm v_j, F\bm u_i)$だと直ぐに分かる。従って、表現行列の成分の値は基底$S$および$T$の選び方に依存する。そのため、表現行列を与えられたとき、それがどのような基底におけるものなのかを確認することは重要と言える。特に断りがないのであれば、標準基底$\{ \bm e_i \}$だと考えるのが一般的である。\par
+\begin{itembox}[l]{補題2.1.1}
+　$V$は$K$上の$\{ \bm 0\}$でない$n$次元ベクトル空間であるとする。$V$の基底として$(\bm v_1, ..., \bm v_n)$と$(\bm v'_1, ..., \bm v'_n)$が考えられるとする。それぞれの基底ベクトルを横に並べた$n$次正方行列$S, S'$に対し、$S'=PS$を満たす正方行列$P$はただ一つに定まる。更に$P$は正則である。
+\end{itembox}
+{\bf 証明：}定理1.1.3より明らか。\par
+このような行列$P$を変換行列と言う。
+\begin{itembox}[l]{定理2.1.1}
+　$U$と$V$は$K$上の有限次元ベクトルであるとし、$U$の次元数を$m$、$V$の次元数を$n$とする。$U$の基底として$S=(\bm u_1, ..., \bm u_m)$と$S'=(\bm u'_1, ..., \bm u'_m)$を考え、$S$から$S'$への変換行列を$P$とする。また、$V$の基底として$T=(\bm v_1, ..., \bm v_n)$と$T'=(\bm v'_1, ..., \bm v'_n)$を考え、$T$から$T'$への変換行列を$Q$とする。線形写像$f:U \to V$の、$S$と$T$における表現行列を$A$としたとき、$S'$と$T'$における表現行列は$Q^{-1}AP$となる。
+\end{itembox}\par
+私たちは既に行列の和やスカラー倍の定義を知っている。また、ゼロ写像に相当するゼロ行列$O$も既に学んでいるだろう。これらを思い出せば、行列の集合$K^{m \times n}$などはベクトル空間の条件を満たしていることに気付く。\par
+任意の$K$上の$m$次元ベクトル空間$U$に対して同型のベクトル空間$K^m$を考え、同様に任意の$K$上の$n$次元ベクトル空間$V$に対して同型のベクトル空間$K^n$を考える。$K^m$及び$K^n$の基底として何か正規直交基底を定める。このように考えたとき、${\rm Hom}_K(U, V) \simeq K^{m \times n}$であることが言える。\par
+線形写像同士の合成写像に対しても表現行列を求めることができる。例えば$f$の表現行列が$A$、$g$の表現行列が$B$である場合、$g \circ f$の表現行列は$BA$となる。同様に、線形変換の多項式への代入は、行列の多項式の代入と考えることができる。例えば$K$次の多項式$P(x)=c_dx^d+...+c_0$があったとき、正方行列$A$に対して
+\begin{equation}
+P(A)=c_dA^d+c_{d-1}A^{d-1}...+c_1A+c_0I \notag
+\end{equation}
+のように定める(ちなみに線形変換の表現行列は必ず正方行列)。\par
+このように、これまで学んできた行列の算法は、線形写像やベクトル空間の条件を満たすように定められていることに気付く。一方で、抽象的な線形代数よりも、$F_{ij}=(\bm v_j, F\bm u_i)$のように数値的な側面が強い分だけ扱いやすかったりする。本章の以後では、このような強みを活かして1章の諸定理を見直しつつ、特殊な行列における諸性質についても紹介していく。
+\begin{itembox}[l]{定理2.1.2}
+行列$A, B \in K^{n \times n}$が正則であるとき、$(AB)^{-1}=B^{-1}A^{-1}$が成立する。
+\end{itembox}
+{\bf 証明}：$(B^{-1}A^{-1})AB=I$より明らか。
+
+
+\subsection{行列式}
+
+\subsection{固有値と固有ベクトル}
+本節では$\{ \bm 0\}$でない有限次元のベクトル空間に対する固有値と固有空間を考える。
+\begin{itembox}[l]{補題2.3.1}
+　$K$上の$\{\bm 0\}$でない有限次元ベクトル空間$V$と、その上の線形変換$f$を考える。$V$の基底$S$に関する$f$の表現行列を$A$とし、別の基底$T$に関する表現行列を$B$とする。このとき、変数$x$の多項式として${\rm det}(xI-A)={\rm det}(xI-B)$が成り立つ。
+\end{itembox}
+{\bf 証明：}基底$S$から$T$への変換行列を$P$とすると、$B=P^{-1}AP$が成立する。よって
+\begin{equation}
+xI-B=xP^{-1}P-P^{-1}AP=P^{-1}(xI-A)P \notag
+\end{equation}
+な訳であって
+\begin{equation}
+{\rm det}(xI-B)={\rm det}(P^{-1})\cdot {\rm det}(xI-A) \cdot {\rm det}(P)=\frac{1}{{\rm det}(P)}\cdot {\rm det}(xI-A) \cdot {\rm det}(P)={\rm det}(xI-A) \notag
+\end{equation}
+より本命題は正しい。\qed \par
+本命題より上記多項式は基底の取り方に依存しない。この多項式のことを固有多項式と言う。$n$次元ベクトル空間における固有多項式は$x$の$n$次式であり、$x^n$の係数は1となる。\par
+代数学により、$n$次の固有多項式は
+\begin{equation}
+F(x)=(x-\alpha_1)(x-\alpha_2)...(x-\alpha_n) \notag
+\end{equation}
+の形に分解できる。ここで$\alpha \in \mathbb{C}$は固有多項式の解である。$x=\alpha_i$のとき、${\rm det}(\alpha_iI-A)=0$より、$\alpha_iI-A$は正則でない。従ってあるベクトル$\bm u$に対して$(\alpha_iI-A)\bm u=\bm v$を満たす$\bm v$は、存在したとしてもゼロベクトルのみである。よって$A\bm u=\alpha_i \bm u$であるから、$\alpha_i$は$A$の固有値だと分かる。なお、$F(x)=0$なる方程式のことを固有方程式と言う。\par
+$A$は$K$の要素を成分とする$n$次正方行列であるとする。行列$A$の定める線形変換を$L_A:K^n \to K^n$とする。標準基底を前提としたとき、$L_A$の表現行列は$A$自身となる。従って、$\bm v \in K^n$が$L_A$の固有ベクトルであるということは、$A\bm v=\alpha \bm v$が成り立つことである。このような$\bm v$や$\alpha$を$A$の固有ベクトル及び固有値と呼ぶ。\par
+定理2.3.1より、以下の系は明らかに成立する。
+\begin{itembox}[l]{系2.3.1}
+　$A$の固有値全体の成す集合と$A$の固有方程式の解全体の成す集合は一致する。
+\end{itembox}
+
+\subsection{Hamilton-Cayleyの定理}
+\begin{itembox}[l]{補題2.4.1}
+　$V$は$\mathbb{C}$上の$\{\bm 0\}$でない$n$次元ベクトル空間であるとする。$V$上の線形変換$f$と$g$は可換であるとする。このとき、$V$の基底$(\bm v_1, ..., \bm v_n)$であって、以下の条件を満たすものが存在する。
+\begin{itemize}
+\item 全ての$j=1, ..., n$について$f(\bm v_j), g(\bm v_j) \in <\bm v_1, ..., \bm v_j>$
+\end{itemize}
+\end{itembox}
+\begin{itembox}[l]{補題2.4.2}
+　$V$は$\mathbb{C}$上の$\{\bm 0\}$でない$n$次元ベクトル空間であるとし、$V$上の線形変換$f$を考える。このとき、$V$の基底$(\bm v_1, ..., \bm v_n)$であって、以下の条件を満たすものが存在する。
+\begin{itemize}
+\item 全ての$j=1, ..., n$について$f(\bm v_j)-\alpha_j \in <\bm v_1, ..., \bm v_n>$が成り立つ。
+\end{itemize}
+さらに、このときの$\alpha_j(j=1, ..., n)$は$f$の全ての固有値である。
+\end{itembox}
+{\bf 証明：}$f$と恒等変換$1_V$は可換であるため、補題2.4.1より$f(\bm v_j) \in <\bm v_1, ..., \bm v_n>$を満たす基底が存在する。そこで、$f(\bm v_j)$が
+\begin{equation}
+f(\bm v_j)=\alpha_j \bm v_j + \lambda_{j-1, j}\bm v_{j-1}+ ... + \lambda_{1, j}\bm v_1 \notag
+\end{equation}
+と書き表せるとするならば、$f$の表現行列$A$は
+\begin{equation}
+A=
+\begin{bmatrix}
+\alpha_1 & \lambda_{1, 2} & ... & \lambda_{1, n} \\
+ & \alpha_2 & ... & \lambda_{2, n} \\
+ &  &  & ... \\
+ &  &  & \alpha_{n} \\
+\end{bmatrix} \notag
+\end{equation}
+となる。よって行列式の性質より$f$の固有多項式は$(x-\alpha_1)(x-\alpha_2)...(x-\alpha_n)$となる。従って、$\{\alpha\}_{i=1}^n$は全ての固有値である。\qed
+\begin{itembox}[l]{命題2.4.1}
+　$A$は複素成分の$n$次正方行列であるとする。このとき、正則行列$P$であって、$P^{-1}AP$が上三角行列となるものが存在する。さらにこのとき、$P^{-1}AP$の対角成分に$A$の全ての固有値が並ぶ。
+\end{itembox}
+{\bf 証明：}$A$は何か線形写像に関する、標準基底における表現行列である。補題2.4.2より、$\mathbb{C}^n$の基底のうち、補題2.4.2の条件を満たす基底$S=(\bm p_1, ..., \bm p_n)$が存在する。標準基底から$S$への変換行列を$P$としたとき、定理2.1.1より$S$における表現行列は$P^{-1}AP$となる。補題2.4.2より、これは上三角行列であり、全ての固有値は対角成分に並ぶ。\qed
+\begin{itembox}[l]{定理2.4.1(Hamilton-Cayleyの定理)}
+　$V$は$K$上の$\{ \bm 0\}$でない有限次元ベクトルであるとし、$f$は$V$上の線形変換であるとする。$f$の固有多項式を$F(x)$と置いたとき、$F(f)=O$(ゼロ写像)である。
+\end{itembox}
+{\bf 証明：}補題2.4.2の条件を満たす基底$(\bm v_1, ..., \bm v_n)$を考える。このとき、スカラー$\alpha_i(i=1, ..., n)$は固有値であるから、$f$の固有多項式は$F(x)=\prod (x-\alpha_i)$である。従って、$F(f)=\prod (f-\alpha_i1_V)$となる。ここで、各$(f-\alpha_i1_V)$は互いに可換である。\par
+$k=1, ..., n$について$((f-\alpha_11_V)...(f-\alpha_k1_V))(\bm v_k)=\bm 0$であることを数学的帰納法で示す。$k=1$のとき、補題2.4.2より明らか。$k=p$のとき成立すると仮定する。$k=p+1$において、補題2.4.2より$(f-\alpha_{p+1}1_V)(\bm v_{p+1})=\sum_{i=1}^p \lambda_i \bm v_i$を満たすスカラー$\lambda_i$が存在する。このとき、
+\begin{equation}
+((f-\alpha_11_V)...(f-\alpha_{p+1}1_V))(\bm v_{p+1})=\sum_{i=1}^p \lambda_i((f-\alpha_11_V)...(f-\alpha_{p}1_V))(\bm v_i) \notag
+\end{equation}
+となるが、仮定よりこれは$\bm 0$となる。以上より、$k=1, ..., n$において$((f-\alpha_11_V)...(f-\alpha_k1_V))(\bm v_k)=\bm 0$が成立する。$(\bm v_1, ..., \bm v_n)$は基底であったため、任意の$\bm v \in V$についてもこれが成立する。従って、$F(f)=O$である。\qed
+\begin{itembox}[l]{系2.4.1}
+正方行列$A$の固有多項式を$F(x)$と置くと、$F(x)=O$である。
+\end{itembox}
+
+\subsection{部分行列と分割行列}
+\subsubsection{部分行列}
+\begin{tcolorbox}[title=部分行列]
+行列$A \in K^{m \times n}$に対して、いくつかの行と列を取り除いてできる行列のことを部分行列と言う。
+\end{tcolorbox}\par
+例えば3行4列の行列
+\begin{equation}
+A=
+\begin{bmatrix}
+2 & 4 & 3 & 6 \\
+1 & 5 & 7 & 9 \\
+-1 & 0 & 2 & 2
+\end{bmatrix} \notag
+\end{equation}
+に対して第2行を削除すれば、2行4列の行列
+\begin{equation}
+\begin{bmatrix}
+2 & 4 & 3 & 6 \\
+-1 & 0 & 2 & 2
+\end{bmatrix} \notag
+\end{equation}
+が得られる。一つの列を除いてできる$m$行1列の行列のことを特別に部分ベクトルと呼ぶことがある。また、正方行列に対して列と同じ行を削除した部分行列($i$列を削除するときは$i$行も削除)のことを主部分行列と言う。$n$行$n$列のうち最後の$n-r$行及び$n-r$列を削除して得られる主部分行列($r$行$r$列)のことを特別に首座部分行列と言う。
+
+\subsubsection{分割行列}
+ある行列$A \in A^{m \times n}$に対して、行もしくは列の間を完全に横断する線を引き、幾つかの部分行列に分割したとする。部分行列を$A_{ij}$とし、$A$を
+\begin{equation}
+A=
+\begin{bmatrix}
+A_{11} & A_{12} & ... & A_{1q} \\
+A_{21} & A_{22} & ... & A_{2q} \\
+... & ... & ... & ... \\
+A_{p1} & A_{p2} & ... & A_{pq} \\
+\end{bmatrix} \notag
+\end{equation}
+のように表したとする。このような表現を分割行列と言う(分割行列であることを表すために、例えば$(A_1~A_2)$ではなく$(A_1|A_2)$のように分割線を明記することもある)。いま$A_{ij} \in K^{m_i \times n_j}$であるとき、定義より各部分行列について以下の条件を満たさなければならない。
+\begin{itemize}
+\item $\sum_i m_i = m$かつ$\sum_j n_j = n$。
+\item 任意の$k(1\leq k \leq p)$について$m_k$は等しい。
+\item 任意の$k(1\leq k \leq q)$について$n_k$は等しい。
+\end{itemize}
+とくに後半の条件は分割線が完全に横断することに由来する。\par
+以下は分割行列に関する定理である(証明は簡単なため省力する)。
+\begin{itembox}[l]{命題2.5.1}
+行列$A, B \in K^{m \times n}$を
+\begin{equation}
+A=
+\begin{bmatrix}
+A_{11} & A_{12} & ... & A_{1q} \\
+A_{21} & A_{22} & ... & A_{2q} \\
+... & ... & ... & ... \\
+A_{p1} & A_{p2} & ... & A_{pq} \\
+\end{bmatrix},~~~
+B=
+\begin{bmatrix}
+B_{11} & B_{12} & ... & B_{1q} \\
+B_{21} & B_{22} & ... & B_{2q} \\
+... & ... & ... & ... \\
+B_{p1} & B_{p2} & ... & B_{pq} \\
+\end{bmatrix} \notag
+\end{equation}
+のように書き表す。なお$A_{ij}$と$B_{ij}$は同じ次元である。このとき、下記の等式が成立する。
+\begin{equation}
+kA=
+\begin{bmatrix}
+kA_{11} & kA_{12} & ... & kA_{1q} \\
+kA_{21} & kA_{22} & ... & kA_{2q} \\
+... & ... & ... & ... \\
+kA_{p1} & kA_{p2} & ... & kA_{pq} \\
+\end{bmatrix},~~~k \in K \notag
+\end{equation}
+\begin{equation}
+A^{\rm T}=
+\begin{bmatrix}
+A^{\rm T}_{11} & A^{\rm T}_{12} & ... & A^{\rm T}_{1q} \\
+A^{\rm T}_{21} & A^{\rm T}_{22} & ... & A^{\rm T}_{2q} \\
+... & ... & ... & ... \\
+A^{\rm T}_{p1} & A^{\rm T}_{p2} & ... & A^{\rm T}_{pq} \\
+\end{bmatrix} \notag
+\end{equation}
+\begin{equation}
+A + B = 
+\begin{bmatrix}
+A_{11}+B_{11} & A_{12}+B_{12} & ... & A_{1q}+B{1q} \\
+A_{21}+B_{21} & A_{22}+B_{22} & ... & A_{2q}+B_{2q} \\
+... & ... & ... & ... \\
+A_{p1}+B_{p1} & A_{p2}+B_{p2} & ... & A_{pq}+B_{pq} \\
+\end{bmatrix}\notag
+\end{equation}
+\begin{equation}
+AB = 
+\begin{bmatrix}
+C_{11} & C_{12} & ... & C_{1q} \\
+C_{21} & C_{22} & ... & C_{2q} \\
+... & ... & ... & ... \\
+C_{p1} & C_{p2} & ... & C_{pq} \\
+\end{bmatrix},~~~C_{ij}=\sum_k A_{ik}B_{kj} \notag
+\end{equation}
+\end{itembox}
+
+
+\section{線形代数の数値計算}
+本章では連立一次方程式の数値解法以外の数値計算について議論する(連立一次方程式の数値解法は工学的に重要であるため、別に章を設けた)。
+\subsection{逆行列の数値計算}
+本節では行基本演算による逆行列の解法を紹介する。行基本演算についてはガウスの消去法の節で議論しているので参考にされたい。以下は解法において重要な定理である。
+\begin{itembox}[l]{定理3.1.1}
+正方行列$A \in K^{n \times n}$を考える。$A$が正則であるとき、拡大係数行列$(A|I)$から行基本演算により$(I|B)$に変形することができる。また、$A$の逆行列は$B$である。逆に$(I|B)$のように変形できない場合、$A$は正則でない。
+\end{itembox}
+{\bf 証明}：$A$が正則であるとする。このとき行基本演算に対応する基本行列の組$E_i$で、$I=E_kE_{k-1}...E_1A$を満たすものが存在する。このとき明らかに$A^{-1}=E_kE_{k-1}...E_1$である。これを拡大係数行列$(A|I)$に施したとき、
+\begin{equation}
+E_kE_{k-1}...E_1(A|I)=(I|E_kE_{k-1}...E_1) \notag
+\end{equation}
+が得られる。従って本定理は正しい。\qed \par
+上記定理より、逆行列は行基本演算より求められることが分かる。
+
+\section{連立一次方程式の数値計算：直接法}
+
+\section{連立一次方程式の数値計算：反復法}
+
+\section{連立一次方程式の数値計算：共役勾配法}
+対称行列を係数とする方程式に対する共役勾配法は、元々直接法として提案された。その後丸め誤差に弱いという欠点ゆえに忘れられつつあったが、1970年代には疎行列の反復解法としての側面が注目され、再び脚光を浴びるようになった。共役勾配法はKrylov部分空間法と呼ばれることも多い。
+\subsection{対称行列に対する共役勾配法}
+連立一次方程式$A\bm x=\bm b$を考える。$A$が正定値対称である場合、解$\bm x^*=A^{-1}\bm b$は2次関数
+\begin{equation}
+\phi(\bm x)=\frac{1}{2}((\bm x-\bm x^*), A(\bm x-\bm x^*))=\frac{1}{2}(\bm x, A\bm x)-(\bm x, \bm b)+\frac{1}{2}(\bm x^*, A\bm x^*) \notag
+\end{equation}
+の最小点となる。また、$A$の正定値性より明らかに$\phi(\bm x^*)=0$が成り立つ。したがって$\phi(\bm x)$を減少させるように候補解を更新していけば、真の解$\bm x^*$の近似値が得られると期待できる。このような手法を逐次最小化法と言う。以下に、$k$ステップ目での逐次最小化法のアルゴリズムを示す。
+\begin{tcolorbox}[title=逐次最小化法の$k$ステップ目]
+\begin{enumerate}
+\item 探索方向ベクトル$\bm p_k \neq \bm 0$を決める。
+\item $\phi(\bm x+\alpha \bm p_k)$を最小にする$\alpha$を$\alpha_k$として、$\bm x_{k+1}=\bm x_k+\alpha_k\bm p_k$に従い更新する。
+\end{enumerate}
+\end{tcolorbox}\par
+近似解の残差を$\bm r_k=\bm b-A\bm x_k$とすと、上式より
+\begin{equation}
+\phi(\bm x+\alpha \bm p_k)=\phi(\bm x)+\frac{\alpha^2}{2}(\bm r_k, \bm p_k)-\alpha(\bm p_k, A\bm p_k) \notag
+\end{equation}
+となる($A$の対称性を利用)。これを最小化する$\alpha=\alpha_k$は
+\begin{equation}
+\alpha_k=\frac{(\bm r_k, \bm p_k)}{(\bm p_k, A\bm p_k)}
+\end{equation}
+と与えられる。\par
+探索方向ベクトルの定め方には色々あるが、最も素朴なものは最急降下方向$\bm s_k=-\bnabla \phi$であろう。上式より、$\bm s_k=\bm b-A\bm x=\bm r$だと直ぐに分かる。探索方向をこのように選んだ手法を最急降下法と言う。証明は省くが、$A$の2ノルムに関する条件数を$\kappa$としたとき、
+\begin{equation}
+\phi(\bm x_{k+1}) \leq \left(\frac{\kappa-1}{\kappa+1}\right)^2\phi(\bm x_k) \notag
+\end{equation}
+が成り立つ。したがって近似解$\bm x_k$は真の解$\bm x^*$に収束する。
+\subsubsection{共役方向法}
+一般の逐次最小化法において、$\bm x_k$はアフィン部分空間
+\begin{equation}
+S_k=\bm x_0+{\rm span}(\bm p_0, ..., \bm p_{k-1}) \notag
+\end{equation}
+に属しているが、$\bm x_k$は$S_k$上で$\phi(\bm x_k)$を最小化しているとは言えない。例えば$\bm x \in K^2$における最小化問題を考えてほしい。この場合、$S_k$は高々数回の更新で$S_k=K^2$となることが期待できるが、最適値$\bm x^*$の探査にはそれ以上の反復計算が一般的に必要であろう。\par
+この最小化に対して以下の定理で示すように、探索方向ベクトルが$(\bm p_i, A\bm p_j)(i < j)$と満たすように選択されている場合、$S_k$上での最小化が実現されることが分かっている。
+\begin{itembox}[l]{定理5.1.1}
+　行列$A$が正定値対称であるとして、逐次最小化法の第$k-1$ステップ終了時点を考える。$\bm p_j \neq 0$かつ$(\bm p_i, A\bm p_j)(i < j)$である場合、以下のことが成り立つ。
+\begin{enumerate}
+\item $\bm p_0, ..., \bm p_{k-1}$は1次独立である。従って${\rm dim}S_k=k$。
+\item $j=0, ..., k-1$に対して、$S_{k+1}$に属する任意の$\bm x$を$\bm x=\hat{\bm x}+\alpha \bm p_j$($\hat{\bm x} \in S_{k+1}$)と表すとき、目的関数$\phi(\bm x)$は$\phi(\bm x)=\phi(\hat{\bm x})+\psi(\alpha \bm p_j)$の形に分離される。ここで$\bm r_0=\bm b-A\bm x_0$として$\psi(\bm p)=(\bm p, A\bm p)/2-(\bm r_0, \bm p)$である。
+\item $\bm x_k$は$S_k$上で目的関数$\phi(\bm x)$を最小化する。
+\item 残差はこれまでの探索方向ベクトルと直交する。つまり$(\bm r_k, \bm p_j)=0(j=0, ..., k-1)$。
+\end{enumerate}
+\end{itembox}
+{\bf 証明：}\\
+(1)$\bm p_0, ..., \bm p_{k-1}$が1次従属である場合、ある探索方向ベクトル$\bm p_l$は$\bm p_l=\sum_{i\neq l} a\bm p_i$のように、他のベクトルの線形結合で表される。この場合、$(\bm p_i, \bm p_l)=(\bm p_i, a_iA\bm p_i)+(\bm p_i, A(\sum_{j \neq l, i}a_j\bm p_j)$となる。$l$以外の探索方向ベクトルが1次独立である場合、右辺第二項はゼロで、第1項は$A$の正定値性より正になる。$l$以外の探索方向ベクトルが1次従属である場合でも、同様の処理を繰り返せば結局$(\bm p_i, A\bm p_j) \neq 0$だと分かる。従って対偶より本定理は正しい。\\
+(2)目的関数の定義より$\phi(\bm x)=\phi(\hat{\bm x})+\psi(\alpha \bm p_j)+\alpha(\hat{\bm x}-\bm x_0, A\bm p_j)$が得られるが、右辺第三項は条件$(\bm p_i, A\bm p_j)=0$よりゼロになる。従って本定理は正しい。\\
+(3)$\phi(\bm x_j)={\rm min}_{\bm x \in S_j}\phi(\bm x)(0 \leq j \leq k)$であることを帰納法で証明する。$j=0$のときは明らか。$\phi(\bm x_j)={\rm min}_{\bm x \in S_j}\phi(\bm x)$が成り立つ場合、$j+1$のときも
+\begin{equation}
+{\rm min}_{\bm x \in S_{j+1}}\phi(\bm x)={\rm min}_{\bm x \in S_j}{\rm min}_{\alpha}(\phi(\hat{\bm x})+\psi(\alpha \bm p_j))=\phi(\bm x_j)+{\rm min}_\alpha \psi(\alpha \bm p_j)={\rm min}_\alpha\phi(\bm x_j+\alpha \bm p_j)=\phi(\bm x_{j+1}) \notag
+\end{equation}
+が成り立つ。従って本定理は正しい。\\
+(4)(3)より、$\bnabla \phi(\bm x_k)=-\bm r_k$は$S_k-\bm x_0={\rm span}(\bm p_0, ..., \bm p_{k-1})$と直交するので明らか。\qed \par
+定理5.1で述べた条件$(\bm p_i, A\bm p_j)=0(i<j)$は$\bm p_0, ..., \bm p_{k-1}$の共役性と呼ばれている。また、このような探索方向ベクトルを用いる手法のことを共役方向法(CD法)と言う。上記定理の(1)(3)より、有限回の反復計算によって$\bm x_k=\bm x^*$の大域的最適化が達成される。この有限解の反復計算で大域的最適化が達成できる性質は、Krylov部分空間法に属する手法全てに対して言えることである。そのためKrylov部分空間には、有限回で済むという直接法的側面と、解を逐次的に更新するという反復法的側面の二面性がある。
+\subsubsection{共役勾配法}
+共役方向の選択はいろいろ考えられるが、その内の一つとして最急降下方向$\bm s_k=\bm r_k$をヒントにすることが考えられる。まず、$\bm p_0=\bm r_0$とし、$k\geq 1$に対しては$\bm r_k$から$A\bm p_j(j=0, ..., k-1)$の成分を引いて$A$共役化させればよいので、
+\begin{equation}
+\bm p_k=\bm r_k-\sum_{j=0}^{k-1}\frac{(\bm r_k, A\bm p_j)}{(\bm p_j, A\bm p_j)}\bm p_j
+\end{equation}
+と定める(これはGram-Schmidtの直交化法と本質的に同じである)。このとき、以下のことが成り立つ。
+\begin{itembox}[l]{補題5.1.1}
+　$A$を正定値対称行列とする。上式によって$\bm p_0, \bm p_1, ...(\neq \bm 0)$を定義していくとき、以下のことが成り立つ。
+\begin{enumerate}
+\item $A$共役性が成り立つ。
+\item $\bm p_k \neq 0$と$\bm r_k \neq 0$は同値であり、$\bm r_k \neq 0$のとき$\alpha_k \neq 0$である。
+\end{enumerate}
+\end{itembox}
+{\bf 証明：}(1)は明らかなので、(2)のみ証明する。$\bm p_k = \bm 0$ならば$\bm r_k \in {\rm span}(\bm p_0, ..., \bm p_{k-1})$であるが、一方で$(\bm r_k, \bm p_j)=0(j=0, ..., k-1)$なので$\bm r_k=\bm 0$。逆に$\bm p_k \neq 0$ならば$\bm p_0, ..., \bm p_k$は一次独立なので、上式より明らか。$\bm r_k \neq 0$のとき、$(\bm r_k, \bm p_k)=(\bm r_k, \bm r_k)\neq 0$より$\alpha_k \neq 0$となる。\qed \par
+この補題が意味するところは、本漸化式によって共役方向法が実現され、残差がゼロでない限り次のステップに進めるということである。\par
+\begin{tcolorbox}[title=Krylov部分空間]
+　正則行列$A \in K^{N \times N}$とあるベクトル$\bm u \in K^N$に対して、$\{\bm u, A\bm u, ..., A^{n-1}\bm u\}$が線形独立であるとする。このとき、$\{\bm u, A\bm u, ..., A^{n-1}\bm u\}$が張るベクトル空間をKrylov部分空間と言い、$\mathcal{K}_n(A, \bm u)$と書く。
+\end{tcolorbox}
+\begin{itembox}[l]{定理5.1.2}
+　前記補題と同じ仮定の下で以下のことが成り立つ。
+\begin{enumerate}
+\item ${\rm span}(\bm p_0, ..., \bm p_k)={\rm span}(\bm r_0, ..., \bm r_k)=\mathcal{K}_{k+1}(A, \bm r_0)$。
+\item $\bm p_k=\bm r_k+\beta_{k-1}\bm p_{k-1},~~\beta_{k-1}=-(\bm r_k, A\bm p_{k-1})/(\bm p_{k-1}, A\bm p_{k-1})$。
+\end{enumerate}
+\end{itembox}
+{\bf 証明：}\\
+(1)第一の等式は漸化式より明らか。第二の等式は帰納法で証明する。$\bm r_k=\bm b-A\bm x_{k}=\bm b-A(\bm x_{k-1}+\alpha_{k-1}\bm p_{k-1})$より、
+\begin{equation}
+\begin{array}{l}
+\bm r_k=(-1)^k(\alpha_0\alpha_1...\alpha_{k-1})A^k\bm r_0+\hat{\bm r}_{k-1} \\
+\hat{\bm r}_{k-1}=(Aのk-1次多項式)\bm r_0 \in \mathcal{K}_k(A, \bm r_0)={\rm span}(\bm r_0, ..., \bm r_{k-1})
+\end{array}\notag
+\end{equation}
+なので$\bm r_k \in \mathcal{K}_{k+1}(A, \bm r_0)$であり、逆に$\alpha_0...\alpha_{k-1}\neq0$であるから$A^k\bm r_0 \in {\rm span}(\bm r_0, ..., \bm r_k)$である。\\
+(2)$j \leq k-2$において、$\bm p_j \in \mathcal{K}_{j+1}(A, \bm r_0)$であり、$A\bm p_j \in \mathcal{K}_{j+2}(A, \bm r_0) \subset \mathcal{K}_k(A, \bm r_0)={\rm span}(\bm p_0, ..., \bm p_{k-1})$である。これと$(\bm r_k, \bm p_i)=0(i=0, ..., k-1)$より$(\bm r_k, A\bm p_j)=0$が得られる。従って本定理は正しい。\qed \par
+定理5.2に従って探索方向ベクトルを決定する方法を共役勾配法(CG法)と言う。共役方向法同様に(丸め誤差などがなければ)有限の反復回数で$\bm x_k=\bm x^*$なる結果を得ることができる。ただし実際は$||\bm r_k||$が$\epsilon||\bm b||$以下となった時点で反復計算を終了する。以下はCG法のアルゴリズムである。
+\begin{tcolorbox}[title=CG法]
+\begin{enumerate}
+\item 初期ベクトル$\bm x_0$を設定する。$\bm r_0=\bm b-A\bm x_0$、$\bm p_0=\bm r_0$。$k=0$。
+\item $||\bm r_k|| < \epsilon||\bm b||$を3-4満足するまでを繰り返す。
+\item 
+\begin{equation}
+\begin{array}{l}
+\alpha_k=\frac{(\bm r_k, \bm p_k)}{(\bm p_k, A\bm p_k)} \\
+\bm x_{k+1}=\bm x_{k}+\alpha_k\bm p_k \\
+\bm r_{k+1}=\bm r_k-\alpha_kA\bm p_k \\
+\beta_{k}=-\frac{(\bm r_{k+1}, A\bm p_k)}{(\bm p_k, A\bm p_k)}\\
+\bm p_{k+1}=\bm r_{k+1}+\beta_k\bm p_k
+\end{array}\notag
+\end{equation}
+\item $k=k+1$
+\end{enumerate}
+\end{tcolorbox}\par
+これまで正定値対称行列を念頭に置いてCG法を導出してきたが、正定値対称でなくてもCGは一応適用できる。ただし、この場合$\bm r_k \neq 0$であるにも関わらず$\beta$や$\alpha$の分母がゼロになり、計算の破綻をきたす可能性がある。また、連立一次方程式の求解と2次関数の最小化を同一視できない。非正定値対称行列におけるCG法は$\phi(\bm x)$の停留値の提供のみ保証する(それでも十分嬉しいが)。
+
+\subsubsection{CG法の収束性}
+
+
+
+\subsubsection{残差直交性に基づくCG法の導出}
+ここまで注目していなかったが、CG法の残差$\bm r_0, \bm r_1, ...$は直交系を成している。実際に、定理5.1の$(\bm r_k, \bm p_j)=0(j=0, ..., k-1)$と定理5.2より$\bm r_j \in {\rm span}(\bm p_0, ..., \bm p_j)$であるため、$(\bm r_k, \bm r_j)=0(0\leq j \leq k-1)$が成立する。$n$次元空間の直交系の長さは$n$以下であるから、ある$\overline{n}(\leq n)$に対して$\bm r_{\overline{n}}=\bm 0$となる。この残差の直交性に着目してCG法を導出する。\par
+定理5.2より、
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+\section{行列と数ベクトル}
+\subsection{内積}
+\begin{tcolorbox}[title=ベクトルのノルム]
+　関数$f:K^n \to K$について、以下の条件を満たすものをノルムと言う。
+\begin{itemize}
+\item $|| \bm u || \geq 0$。$|| \bm u|| = 0 \Leftrightarrow \bm u = \bm 0$。
+\item $||a\bm u||=|a|||\bm u||$。
+\item $||\bm u+\bm v|| \leq ||\bm u||+||\bm v||$。
+\end{itemize}
+\end{tcolorbox}
+例えば数ベクトルの場合、任意の$p \in \mathbb{N}$に対して$p$ノルム
+\begin{equation}
+||\bm u||_p=\left(\sum_{i=1}^n |u_i|^p\right)^\frac{1}{p} \notag
+\end{equation}
+がよく使われている(一般的にノルムとだけ言われると$p=2$のことを指していることが多い)。\par
+上記のノルムの定義は当然ながら数ベクトル以外でも適用可能である。例えば行列もベクトルの一種であるが、$A \in K^{m\times n}$のフロベニウスノルム
+\begin{equation}
+||A||_F=\sqrt{\sum_{i=1}^m\sum_{j=1}^n |a_{ij}|^2} \notag
+\end{equation}
+は有名である。また、一般的に$||A||_p(p \in \mathbb{N})$と書くと、$\bm u \in \mathbb{R}^n$に対して
+\begin{equation}
+||A||_p={\rm sup}_{\bm u \neq \bm 0}\frac{||A\bm u||_p}{||\bm u||_p} \notag
+\end{equation}
+のことを指す。
+\begin{itembox}[l]{命題}
+\begin{enumerate}
+\item $||A\bm u||_p \leq ||A||_p||\bm u||_p,~~~||A\bm u||_2 \leq ||A||_F||\bm u||_2$。
+\item $||AB||_p \leq ||A||_p||B||_p,~~~||AB||_F \leq ||A||_F||B||_F$。
+\item $||PAQ||_2=||A||_2,~~~||PAQ||_F=||A||_F$。ここで$P$と$Q$は直交行列。
+\end{enumerate}
+\end{itembox}
+{\bf 証明(1)：}ノルムの定義より、任意の$\bm u$に対して、$||A\bm u||_p/||\bm u||_p \leq ||A||_p$が成立する。したがって(1)は正しい。\qed \\
+\begin{tcolorbox}[title=条件数]
+　逆行列を有する行列$A \in \mathbb{R}^{n \times n}$に対して$||A||_p||A^{-1}||_p$のことを$p$ノルムの条件数と言い、$\kappa(A)$と書く。
+\end{tcolorbox}
+例えば$A\bm x=\bm b$なる連立一次方程式を考えよう。いま、$A$と$B$が微小に変化したときに、解$\bm x$がどの程度変わるのかを考える。そこで、変化後の連立一次方程式を$(A+\Delta A)(\bm x+\Delta \bm x)=\bm b+\Delta \bm b$のように書き表す。両式より、$\Delta x$は
+\begin{equation}
+\Delta \bm x=A^{-1}\left\{ -\Delta A(\bm x+\Delta \bm x)+\Delta \bm b \right\} \notag
+\end{equation}
+となる。ノルムに関する命題より、
+\begin{equation}
+\frac{||\Delta \bm x||_p}{||\bm x+\Delta \bm x||_p} \leq \kappa(A)\left( \frac{||\Delta A||_p}{||A||_p}+\frac{||\Delta \bm b||_p}{||A||_p||\bm x+\Delta \bm x||_p}\right) \notag
+\end{equation}
+が得られる。従って条件数が大きい場合、$\bm x$の変動も大きいことが分かる。逆に$\bm x+\Delta \bm x$が連立一次方程式の解の候補であったとしよう。当然ながら$A (\bm x+\Delta \bm x) \neq \bm b$であり、$A$と$\bm b$を$(A+\Delta A)(\bm x+\Delta \bm x)=\bm b+\Delta \bm b$のように変えてようやく等式が成立するとする。この場合、上式は真の解$\bm x$からの差異$\Delta x$に関する不等式と考えることができ、条件数が大きいとき程$\Delta x$も大きくなる。そのため、条件数の大きい連立一次方程式は数値計算による求解が難しい。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+\begin{tcolorbox}[title=行列の対角表現]
+　行列$A$が$A=\sum_i \lambda_i \bm u_i \bm u_i^{\rm T}$のように書き表せるとき、$A$は対角化可能であると言う。
+\end{tcolorbox}\par
+$\sum_i \lambda_i \bm u_i \bm u_i^{\rm T}$を対角表現と言う。明らかに$\bm u_i$は$A$の固有ベクトルであり、$\lambda_i$は$\bm u_i$に対応する固有値である。
+\begin{itembox}[l]{命題}
+　ベクトル空間$V$の正規オペレータ$M$について、$M$は$V$のある基底に対し対角である。逆に任意の対角可能なオペレータは正規である。
+\end{itembox}\par
+この命題はスペクトル分解と呼ばれるもので、特に量子情報科学において重要である。オペレータについて言及されたものであるが、これを表現行列に当てはめることもできる。また、基底の変換を考えると、表現行列$A$は$A=\sum_i \lambda_i \bm u_i \bm u_i^{\rm T}$のように書くことができること、つまり対角表現可能であることも直ぐに分かる。ここで$\bm u_i$は$A$の固有ベクトル、$\lambda_i$は$\bm u_i$に対応する固有値である。
+
+\begin{tcolorbox}[title=転置行列]
+　行列$A \in K^{m \times n}$と$B\in K^{m \times n}$について$a_{ij}=b_{ji}$が成立するとき、$B$は$A$の転置行列と言い、$B=A^{\rm T}$と書きあらわす。
+\end{tcolorbox}
+\begin{itembox}[l]{命題}
+　${\rm det}(A^{\rm T})={\rm det}(A)$が成立する。
+\end{itembox}
+\begin{tcolorbox}[title=直交行列]
+　行列$Q \in \mathbb{R}^{n\times n}$について$Q^{\rm T}Q=I$が成立するとき、$Q$は直交行列と言う。
+\end{tcolorbox}
+\begin{tcolorbox}[title=三角行列]
+　行列$A=(a_{ij}) \in K^{m \times n}$に関して、$i<j$なる全ての$a_{ij}$がゼロの場合上三角行列と言い、$i>j$なる全ての$a_{ij}$がゼロのとき下三角行列と言う。
+\end{tcolorbox}
+\begin{itembox}[l]{命題}
+　上(下)三角行列同士の積は上(下)三角行列である。
+\end{itembox}
+\begin{itembox}[l]{命題}
+　上(下)三角行列の行列式は対角成分の積$\prod_i a_{ii}$に等しい。
+\end{itembox}
+\begin{tcolorbox}[title=対称行列とエルミート行列]
+　行列$A \in \mathbb{R}^{n \times n}$が$A^{\rm T}=A$を満たすとき、$A$のことを対称行列と言う。また、$A \in \mathbb{C}^{n \times n}$が$A^\dagger=A$を満たすとき、$A$のことをエルミート行列と言う。
+\end{tcolorbox}
+\begin{tcolorbox}[title=対称行列(エルミート行列)の定値性]
+　対称行列(エルミート行列)$A \in K^{n \times n}$がゼロベクトルでない任意のベクトル$\bm x \in \mathbb{R}^n$に対して$\bm x^\dagger A\bm x > 0$を満たすとき、$A$のことを正定値行列と言う。任意の$\bm x\in \mathbb{R}^n$に対して$\bm x^\dagger A\bm x \geq 0$を満たすとき、$A$を半正定値行列と言う。ゼロベクトルでない任意のベクトル$\bm x \in \mathbb{R}^n$に対して$\bm x^\dagger A\bm x < 0$を満たすとき、$A$のことを負定値行列と言う。任意の$\bm x\in \mathbb{R}^n$に対して$\bm x^\dagger A\bm x \leq 0$を満たすとき、$A$を半負定値行列と言う。正定値行列、半正定値行列、負定値行列、半負定値行列のいずれでもない$A$を不定値行列と言う。
+\end{tcolorbox}
+\begin{itembox}[l]{命題}
+エルミート行列$A \in K^{n \times n}$を
+\begin{equation}
+A=
+\begin{bmatrix}
+B & C \\
+C^\dagger &D
+\end{bmatrix},~~~B \in K^{m \times m},~~~D \in K^{(n-m)\times(n-m)} \notag
+\end{equation}
+のように分割したとする。このとき、$B$と$D$の定値性は$A$の定値性と等しい。
+\end{itembox}
+{\bf 証明：}ゼロベクトルでないベクトル$\bm x=(x_1, x_2, ..., x_n)^{\rm T}$について、$x_i=0(i=m+1, ..., n)$とする。このとき、$\bm x^\dagger A\bm x=\bm x^\dagger B\bm x$となるため、$B$と$A$の定値性は確かに等しい。$D$に関しても同様に調べられる。\qed
+\begin{tcolorbox}[title=正則]
+　正方行列$A \in K^{n \times n}$に関して、$AB=BA=I$を満たす正方行列$B \in K^{n \times n}$が存在するとき、$B$のことを$A$の逆行列と言う。また、逆行列を有する行列は、正則であると呼び、正則でない行列のことを、特異であると呼ぶ。
+\end{tcolorbox}
+\begin{itembox}[l]{命題}
+　正則行列の逆行列は一意に決まる。
+\end{itembox}
+{\bf 証明：}相異なる行列$B$と$C$が正則行列$A$の逆行列であるとする。この場合、
+\begin{equation}
+B=B(AC)=(BA)C=C \notag
+\end{equation}
+が成立することになり、矛盾が生じる。したがって本命題は正しい。\qed
+\begin{itembox}[l]{命題}
+　スペクトル半径が1以下の正則行列$A$を考える。このとき、$(I-A)^{-1}=\sum_{i=0}^{\infty}A^i$が成立する。
+\end{itembox}\par
+{\bf　証明：}$(I-A)(I+A+A^2+...)=I+A+A^2+...-A-A^2-...=I$より明らか。\qed \par
+スペクトル半径が1以上の場合、${\rm lim}_{n \to \infty}A^n$の要素値は発散してしまう。
+\begin{itembox}[l]{補題}
+　${\rm det}(AB)={\rm det}(A){\rm det}(B)$が成立する。
+\end{itembox}\par
+\begin{itembox}[l]{命題}
+　行列$A$が正則であることと${\rm det}(A) \neq 0$であることは同値である。
+\end{itembox}
+{\bf 証明：}${\rm det}(I)={\rm det}(A){\rm det}(A^{-1})=1$であるため、確かに${\rm det}(A) \neq 0$である。\qed \par
+この命題より、${\rm det}(A^{-1})=1/{\rm det}(A)$であることも分かる。
+\begin{tcolorbox}[title=部分行列]
+　行列から幾つかの行や列を削除することで得られる行列のことを部分行列と言う。
+\end{tcolorbox}
+例えば行列
+\begin{equation}
+\begin{bmatrix}
+2 & 4 & 3 & 6 \\
+1 & 5 & 7 & 9 \\
+-1 & 0 & 2 & 2
+\end{bmatrix} \notag
+\end{equation}
+の、第2行を削除した部分行列、第1列と第3列を削除した部分行列、第2行と第1列と第3列を削除した部分行列はそれぞれ
+\begin{equation}
+\begin{bmatrix}
+2 & 4 & 3 & 6 \\
+-1 & 0 & 2 & 2
+\end{bmatrix},~~~
+\begin{bmatrix}
+4 & 6 \\
+5 & 9 \\
+0 & 2
+\end{bmatrix},~~~
+\begin{bmatrix}
+4 & 6 \\
+0 & 2
+\end{bmatrix} \notag
+\end{equation}
+となる。なお、何の行や列も削除されなかった行列、つまり自身と全く同じ行列も部分行列として扱われる。
+\begin{tcolorbox}[title=主部分行列]
+　正方行列に対して、同じ列と行を削除して得られる部分行列(第$i$行を削除するなら第$i$列も削除、その逆も然り)のことを主部分行列と言う。特に、$n \times n$行列の右側$r$列と下側$r$列を削除して得られる主部分行列$ \in K^{n-r \times n-r}$のことを首座部分行列と言う。
+\end{tcolorbox}
+\begin{itembox}[l]{命題}
+　対称行列の主部分行列は対称行列であり、上(下)三角行列の主部分行列は上(下)三角行列である。
+\end{itembox}
+
+\begin{tcolorbox}[title=分割行列]
+　行列$A$に対して、行や列の間に水平線もしくは垂線を引くことで部分行列に分割することができる。このときの各部分行列のことをブロックと言い、通常$A_{ij}$のように書き表す。ここで下付き文字はブロックの位置を表しており、元の$A$に対して
+\begin{equation}
+A=
+\begin{bmatrix}
+A_{11} & A_{12} & ... & A_{1q} \\
+A_{21} & A_{22} & ... & A_{2q} \\
+ & & & \\
+A_{p1} & A_{p2} & ... & A_{pq} \\
+\end{bmatrix} \notag
+\end{equation}
+のような関係がある。元の$A$を上式のように書き表したとき、ブロックに対して分割行列と言う。
+\end{tcolorbox}
+定義より、各$A_{iJ}(i=1,...,p)$の列数は等しく、各$A_{Ij}(j=1,...,q)$の行数も等しい。
+
+\begin{itembox}[l]{命題}
+行列$A \in K^{m \times n}$を$A_{ij} \in K^{m_i \times n_j}$のブロックで
+\begin{equation}
+A=
+\begin{bmatrix}
+A_{11} & A_{12} & ... & A_{1q} \\
+A_{21} & A_{22} & ... & A_{2q} \\
+ & & & \\
+A_{p1} & A_{p2} & ... & A_{pq} \\
+\end{bmatrix} \notag
+\end{equation}
+のように分割したとする。このとき、以下の等式が成立する。
+\begin{equation}
+aA = 
+\begin{bmatrix}
+aA_{11} a& A_{12} & ... & aA_{1q} \\
+aA_{21} a& A_{22} & ... & aA_{2q} \\
+ & & & \\
+aA_{p1} & aA_{p2} & ... & aA_{pq} \\
+\end{bmatrix} \notag
+\end{equation}
+\begin{equation}
+A^{\rm T} = 
+\begin{bmatrix}
+A_{11}^{\rm T} & A_{21}^{\rm T} & ... & A_{q1}^{\rm T} \\
+A_{12}^{\rm T} & A_{22}^{\rm T} & ... & A_{q2}^{\rm T} \\
+ & & & \\
+A_{1p}^{\rm T} & A_{2p}^{\rm T} & ... & A_{qp}^{\rm T} \\
+\end{bmatrix} \notag
+\end{equation}
+\end{itembox}
+
+\begin{itembox}[l]{命題}
+行列$A, B \in K^{m \times n}$を$A_{ij}, B_{ij} \in K^{m_i \times n_j}$のブロックで
+\begin{equation}
+A=
+\begin{bmatrix}
+A_{11} & A_{12} & ... & A_{1q} \\
+A_{21} & A_{22} & ... & A_{2q} \\
+ & & & \\
+A_{p1} & A_{p2} & ... & A_{pq} \\
+\end{bmatrix}, ~~~
+B=
+\begin{bmatrix}
+B_{11} & B_{12} & ... & B_{1q} \\
+B_{21} & B_{22} & ... & B_{2q} \\
+ & & & \\
+B_{p1} & B_{p2} & ... & B_{pq} \\
+\end{bmatrix} \notag
+\end{equation}
+のように分割したとする。このとき、以下の等式が成立する。
+\begin{equation}
+A+B=
+\begin{bmatrix}
+A_{11}+B_{11} & A_{12}+B_{12} & ... & A_{1q}+B_{1q} \\
+A_{21}+B_{21} & A_{22}+B_{22} & ... & A_{2q}+B_{2q} \\
+ & & & \\
+A_{p1}+B_{p1} & A_{p2}+B_{p2} & ... & A_{pq}+B_{pq} \\
+\end{bmatrix} \notag
+\end{equation}
+\end{itembox}
+\begin{itembox}[l]{命題}
+行列$A \in K^{m \times n}$を$A_{ij} \in K^{m_i \times n_j}$のブロックで、行列$B \in K^{k \times l}$を$B_{ij} \in B^{k_i \times l_j}$のブロックで
+\begin{equation}
+A=
+\begin{bmatrix}
+A_{11} & A_{12} & ... & A_{1q} \\
+A_{21} & A_{22} & ... & A_{2q} \\
+ & & & \\
+A_{p1} & A_{p2} & ... & A_{pq} \\
+\end{bmatrix}, ~~~
+B=
+\begin{bmatrix}
+B_{11} & B_{12} & ... & B_{1s} \\
+B_{21} & B_{22} & ... & B_{2s} \\
+ & & & \\
+B_{r1} & B_{r2} & ... & B_{rs} \\
+\end{bmatrix} \notag
+\end{equation}
+のように分割したとする。ここで$q=r$かつ$n_j=k_i$である。このとき、以下の等式が成立する。
+\begin{equation}
+AB=
+\begin{bmatrix}
+F_{11} & F_{12} & ... & F_{1s} \\
+F_{21} & F_{22} & ... & F_{2s} \\
+ & & & \\
+F_{p1} & F_{p2} & ... & F_{ps} \\
+\end{bmatrix},~~~F_{ij}=\sum_{x=1}^qA_{xk}B_{xj} \notag
+\end{equation}
+\end{itembox}\par
+特に$B=(B_1, B_2, ..., B_n)$のように分割した場合、$AB=(AB_1, ..., AB_n)$となる。
+
+
+
+
+
+\begin{tcolorbox}[title=係数行列と拡大係数行列]
+　連立一次方程式$A\bm x = \bm b (A \in K^{m \times n}, \bm x \in K^n, \bm n \in K^m)$に対して、$A$のことを係数行列と言う。また、$(A|\bm b) \in K^{m \times n+1}$のことを拡大係数行列と言う。
+\end{tcolorbox}
+\begin{tcolorbox}[title=行基本演算]
+行列に対する下記の演算を行基本演算と言う。
+\begin{itemize}
+\item ある行の定数倍を他の行に加える(R1)。
+\item ある行を非ゼロ定数倍する(R2)。
+\item 2つの行を入れ替える(R3)。
+\end{itemize}
+\end{tcolorbox}
+\begin{itembox}[l]{命題}
+　連立一次方程式$A\bm x=\bm b$に関する拡大係数行列に対して、行基本演算を何度か施したとする。その結果得られた拡大係数行列に関する連立一時方程式$A'\bm x=\bm b'$の解は、元の解と等しい。
+\end{itembox}
+\begin{itembox}[l]{命題}
+\begin{itemize}
+\item 第$j$行の$a$倍を第$i$行に加える行基本演算(R1)は、「単位行列$I$を$I_{ij}=a$に置き換えた行列$P_{a,j,i}$」を左から作用させる処理と同じである。
+\item 第$i$列を$a$倍する行基本演算(R2)は、「単位行列$I$を$I_{ii}=a$に置き換えた行列$Q_{a,i}$」を左から作用させる処理と同じである。
+\item 第$j$行と$i$行を入れ替える行基本演算(R3)は、「単位行列$I$の$j$行と$i$行を置き換えた行列$R_{j,i}$」を左から作用させる処理と同じである。
+\end{itemize}
+\end{itembox}
+\begin{itembox}[l]{命題}
+\begin{itemize}
+\item 第$j$行の$a$倍を第$i$行に加える行基本演算(R1)に関する行列を$R1_{c, i, j}$と書くことにする。$R1_{c, i, j}$の逆行列は$R1_{-c, i, j}$である。
+\item 第$i$列を$a$倍する行基本演算(R2)に関する行列を$R2_{c, i}$と書くことにする。$R2_{c, i}$の逆行列は$R2_{1/c, i}$である。
+\item 第$j$行と$i$行を入れ替える行基本演算(R3)を$R3_{i, j}$と書くことにする。$R3_{i, j}$の逆行列は$R3_{i, j}$であり、それ自身と等しい。
+\end{itemize}
+\end{itembox}
+\begin{tcolorbox}[title=ガウスの消去法]
+　連立一次方程式$A\bm x=\bm b(A \in K^{n \times n}, \bm x \in K^n, \bm b \in K^n)$を考える。この拡大係数行列$(A|\bm b)$に対して行基本演算を施し、$(I|\bm b')$となるようにする。このとき、連立一次方程式の解は$\bm b'$である。この解法をガウスの消去法と言う。
+\end{tcolorbox}
+この証明は前述の命題より明らかなので省略する。例えば$A=(a_{ij})$と表記したとき、拡大係数行列は
+\begin{equation}
+\begin{bmatrix}
+a_{11} & a_{12} & a_{13} & ... & a_{1n} & b_1 \\
+a_{21} & a_{22} & a_{23} & ... & a_{2n} & b_2 \\
+& & & & & \\
+& & & & & \\
+a_{n1} & a_{n2} & a_{n3} & ... & a_{nn} & b_n \\
+\end{bmatrix} \notag
+\end{equation}
+である。このうち左$n$列分を単位行列に変形させるので、まずは1行1列の成分を1に変える(R2処理)。すると、
+\begin{equation}
+\begin{bmatrix}
+1 & \frac{a_{12}}{a_{11}} & \frac{a_{13}}{a_{11}} & ... & \frac{a_{14}}{a_{11}} & \frac{b_1}{a_{11}} \\
+a_{21} & a_{22} & a_{23} & ... & a_{2n} & b_2 \\
+& & & & & \\
+& & & & & \\
+a_{n1} & a_{n2} & a_{n3} & ... & a_{nn} & b_n \\
+\end{bmatrix} \notag
+\end{equation}
+のようになる。次に第1列の第1行以降をゼロになるようにR1処理を施す。従って、
+\begin{equation}
+\begin{bmatrix}
+1 & a'_{12} & a'_{13} & ... & a'_{1n} & b'_1 \\
+0 & a_{22}-a_{21}a'_{12} & a_{23}-a_{21}a'_{13} & ... & a_{2n}-a_{21}a'_{1n} & b_2-a_{21}b'_1 \\
+& & & & & \\
+& & & & & \\
+0 & a_{n2} & a_{n3} & ... & a_{nn} & b_n \\
+\end{bmatrix} \notag
+\end{equation}
+が得られる(ここで$a'_{1i}(i=1,...,n)$と$b'_1$は直前のR2演算後の要素値である)。同様の処理を第2列以降も続ける。つまり、第2列ではまず初めに$a_{22}-a_{21}a'_{12}$が1となるようにR2基本演算し、2行2列成分以外がゼロとなるようにR1基本演算を施す。このとき、第1列の値が変わることはなく、同様に第$i$列に着目して処理を施しているときに第1列から$(i-1)$列までの値が変化することもない。従って上記の処理を施すことで拡大係数行列は$(I|\bm b')$に書き換えられる。\par
+以上がガウスの消去法の基本的なアルゴリズムだが、これだと計算不可能になることもある。というのもガウスの消去法には$1/a_{ii}$倍のR2処理が存在するが、$a_{ii}=0$の場合は計算不可能である。また、ゼロでなく非常に小さい絶対値の場合でも数値計算時に発散の原因となる。\par
+したがって対角成分がゼロや非常に小さい絶対値の場合は、R3処理による行の交換をしなければならない。この処理をガウスの消去法では特別にピボット処理と言う。例えば第i列に着目している場合、一般的には計算安定性を考慮し、$A_{i:n, i}=(a_{i, i}, a_{i+1, i}, ..., a_{n, i})$のうち絶対値が最大となる行$j$と$i$を交換する($A_{i:n, i}$のことを$i$のピボット列と言う)。これまでの処理により$A_{i:n, k}=(a_{i, k}, ..., a_{n, k})\{ k=1, ..., i-1\}$は全てゼロなので、第1列から第$(i-1)$列までの値はピボット処理により変化しない。したがって変わらず$(I|\bm b')$のような拡大係数行列を計算できる。\par
+ガウスの消去法は複素連立一次方程式でも利用可能である。しかも実数の場合とプログラミングコードにほとんど差がない。以下は複素連立一次方程式におけるPythonコード例である。
+\begin{python}
+import numpy as np
+
+def getR1(n, a, j, i):
+	P = np.eye(n).astype(complex); P[i, j] += a
+	return P
+
+def getR2(n, a, i):
+	Q = np.eye(n).astype(complex); Q[i, i] *= a
+	return Q
+
+def getR3(n, i, j):
+	R = np.eye(n).astype(complex)
+	R[i, i] = 0; R[i, j] = 1.; R[j, j] = 0; R[j, i] = 1.
+	return R
+def getAuA(A, b):
+	b = np.expand_dims(b, axis = -1)
+	return np.concatenate((A, b), axis = -1)
+
+
+def Gauss(A, b):
+	n = len(b)
+	auA = getAuA(A, b)
+
+	for j in range(n):
+		maxidx = np.argmax(np.abs(auA[j:,j]))+j
+		if maxidx != j:
+			auA = getR3(n, j, maxidx)@auA
+		auA = getR2(n, 1./auA[j, j], j)@auA
+		for i in range(n):
+			if i != j:
+				auA = getR1(n, -auA[i, j], j, i)@auA
+	return auA[:,-1]
+
+
+A = np.array([
+	[1.+1.j, -1.],
+	[1.-1.j, 1.+1.j]]).astype(complex)
+b = np.array([1.j, 1.]).astype(complex)
+x = Gauss(A, b)
+\end{python}\par
+はじめの関数\pythoninline{getR1, getR2, getR3}はそれぞれ行基本演算の関数である。また\pythoninline{getAuA}で拡大係数行列が得られる。関数\pythoninline{Gauss}中の初めのforjループは列毎の繰り返しのためにある。初めにピボット列中の絶対値が最大となる行を見つけ(\pythoninline{maxidx})、必要と判断すればR3処理を施す。その後R2処理により対角成分の値を1にして、R1処理により対角成分以外の値を全てゼロにする(コード中foriループ)。forjループが終われば、一番後ろの列を連立一次方程式の解として返す。\par
+次にガウスの消去法の演算量を議論しよう。ただしピボットの有無は行列に依存するため、ここではピボット選択なしで実数値におけるガウスの消去法に限定して考える。第$j$列に着目しているとき、R2処理に$n-j$回の演算が必要である。また、R1処理は$(n-1)(n-j)$回行われる訳だが、R1処理自体に3回の演算が必要なので、総合して$3(n-1)(n-j)$回の演算量となる。これが各列で行われるので、ガウスの消去法の演算量は
+\begin{equation}
+\sum_{j=1}^n\left\{ (n-j)+3(n-1)(n-j) \right\} \simeq \frac{3}{2}n^3 \notag
+\end{equation}
+だと分かる。なお、この演算量はR1処理を行列演算でしなかった場合のものである。上記のpythonコードはR1処理を行基本行列演算で行っている分、第$j$列に着目しているときも第$i(i<j)$列に対して演算している(本来は不要であるにも関わらず)。したがってpythonコードの演算量は$3n^3/2$よりも多い(ただしオーダーは同じ)。
+
+\begin{tcolorbox}[title=行階段形]
+　以下の条件を満たす行列のことを行階段形という。
+\begin{itemize}
+\item 非ゼロ要素を持つ行はどのゼロしかない行よりも上にある。
+\item 各行の左から数えて最初の非ゼロ要素は1である。
+\item $i < j$なら第$i$行の非ゼロ要素は第$j$行の非ゼロ要素よりも厳密に左にある。
+\end{itemize}
+\end{tcolorbox}
+なお、行階段形の各行の最初の非ゼロ要素を枢軸と言う。行階段形の例を以下に示す(空白部分の成分はゼロ、$*$部分は任意の数値を表す)。
+\begin{equation}
+\begin{bmatrix}
+ & 1 & * & * & * & * & * & * & * \\
+ &    &   & 1 & * & * & * & * & * \\
+ &    &   &   & 1 & * & * & * & * \\
+ &    &   &   &  &  &  & 1 & * \\
+ &    &   &   &  &  &  &  &  \\
+\end{bmatrix}\notag
+\end{equation}
+
+\begin{tcolorbox}[title=既約行階段形]
+　以下の条件を満たす行列のことを既約行階段形という。
+\begin{itemize}
+\item 行階段形である。
+\item 枢軸のある列のピボット以外の要素はゼロである。
+\end{itemize}
+\end{tcolorbox}
+既約行階段形の例を以下に示す(空白部分の成分はゼロ、$*$部分は任意の数値を表す)。
+\begin{equation}
+\begin{bmatrix}
+ & 1 & * &  &  & * & * &  & * \\
+ &    &   & 1 &  & * & * &  & * \\
+ &    &   &   & 1 & * & * &  & * \\
+ &    &   &   &  &  &  & 1 & * \\
+ &    &   &   &  &  &  &  &  \\
+\end{bmatrix}\notag
+\end{equation}
+\begin{itembox}[l]{命題}
+　連立一次方程式$A\bm x=\bm b$が解を有する場合、拡大係数行列$(A|\bm b)$は行基本演算で既約行階段形に変換できる。
+\end{itembox}\par
+これはピボットありのガウスの消去法について述べているに過ぎない。
+\begin{tcolorbox}[title=枢軸変数と自由変数]
+　連立一次方程式の変数に関して、対応する行が既約行階段形において枢軸をもつ場合、その変数のことを枢軸変数と言う。また、枢軸変数でない変数のことを自由変数と言う。
+\end{tcolorbox}
+各行には高々1個の枢軸変数があるだけなので、枢軸を持つ行は自由変数による枢軸変数を表す式を与える。例えば連立一次方程式
+\begin{equation}
+\begin{bmatrix}
+1 & 1/4 & 0 & 1/2 \\
+2 & 1/4 & 0 & 0 \\
+1 & 0 & 8 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+x \\ y \\ z \\ w
+\end{bmatrix}
+=
+\begin{bmatrix}
+20 \\ 36 \\ 176
+\end{bmatrix} \notag
+\end{equation}
+の既約行階段形は
+\begin{equation}
+\begin{bmatrix}
+1 & 0 & 0 & -1/2 \\
+0 & 1 & 0 & 4 \\
+0 & 0 & 1 & 3/16
+\end{bmatrix} \notag
+\end{equation}
+なので、枢軸変数は$\{x, y, z\}$、自由変数は$\{ w \}$となる。この場合、$w$の値を一意に決められないため、連立一次方程式の解も一意に決まらない。ただし$w$の値を一つに定めたとき、枢軸変数は
+\begin{equation}
+\begin{array}{l}
+x=16+w/2 \\
+y = 16-4w \\
+z = 20-3w/16
+\end{array} \notag
+\end{equation}
+より求まる。
+\begin{itembox}[l]{命題}
+　連立一次方程式が解をもつ必要十分条件は、その拡大係数行列の行階段形の最後の列に枢軸がないことである。
+\end{itembox}
+{\bf 証明：}最後の列に枢軸がある場合、一番下の行に関する方程式は$(\bm 0, \bm x)=1$となるが、これはベクトル空間の定義より成立しない。よって本命題は正しい。\qed
+
+\begin{itembox}[l]{命題}
+　解を持つ連立一次方程式$A\bm x=\bm b(A \in K^{m\times n}, \bm x \in K^n, \bm b \in K^m)$に対して、その解が一意である必要十分条件は拡大係数行列の行階段形の初めの$n$列の全てに枢軸があることである。
+\end{itembox}\par
+このことから、$m < n$なら連立一次方程式は一意解をもたないことが分かる。
+\begin{tcolorbox}[title=劣決定と優決定]
+　連立一次方程式$A\bm x=\bm b(A \in K^{m\times n}, \bm x \in K^n, \bm b \in K^m)$に対して、$m < n$のとき劣決定であると言い、$m>n$のとき優決定であると言う。
+\end{tcolorbox}
+劣決定の場合、必ず自由変数が含まれるため解は一意に決まらない。一方で優決定の場合、方程式による制約がきつすぎて解が存在しない可能性がある。
+
+\begin{itembox}[l]{補題}
+　正方行列が正則である場合、行列の既約行階段形は単位行列となる。
+\end{itembox}
+{\bf 証明：}正則行列$A \in K^{n \times n}$と任意のベクトル$\bm b$による連立一次方程式$A\bm x=\bm b$を考える。$A$は正則なので、解は一意に定まる。したがって前述の命題より、$A$の枢軸は全列の対角成分に位置する。よって既約行階段形は単位行列となる。\qed
+\begin{itembox}[l]{命題}
+　正則行列$A$に対し、$A$と単位行列をブロックに有する分割行列$(A|I)$を考える。分割行列を行基本演算により$(I|B)$と変形したとき、$B$は$A$の逆行列となる。
+\end{itembox}
+{\bf 証明：}いくつかの行基本変形を順に施した場合、その作用は一つの行列$E$で表現できる。つまり行列$A$が正則なら$EA=I$なる$E$が複数の行基本変形で構成することができる。このとき明らかに$A$の逆行列は$E$である一方、$A$の逆行列は$E$である。分割行列$(A|I)$に左から$E$をかけた場合、$E(A|I)=A^{-1}(A|I)=(I|A^{-1})$となる。したがって本命題は正しい。\qed
+
+\begin{tcolorbox}[title=LU分解]
+　行列$A \in K^{m \times n}$を上三角行列$U \in K^{m \times n}$と下三角行列$L \in K^{m \times m}$で$A=LU$のように分解することをLU分解と言う。
+\end{tcolorbox}
+いまピボット選択をしないガウスの消去法を考える。枢軸要素を1にすることにこだわらなければ、行基本演算$R1$によって$A$を上三角行列$U$に変換することは可能である。このとき第$j$の$a$倍を加える行は第$i(i>j)$行に限られる。この作用に関する行列を$R1_{c, i, j}$と書くことにする。すると、$A$と$U$の関係は$R1_{c_k, i_k, j_k} ... R1_{c_1, i_1, j_1}A=U$のように書き表すことができるであろう。R1の逆行列を順にかけていくと、$A=R1_{-c_1, i_1, j_1} ... R1_{-c_k, i_k, j_k}U$が得られる。いま$i_r>j_r(r=1, ..., k)$なので、$R1_{-c_r, i_r, j_r}$は下三角行列である。そのため$R1_{-c_1, i_1, j_1} ... R1_{-c_k, i_k, j_k}$も$m$行$m$列の下三角行列であるため、これを$L$と置く。このように、行列は下三角行列と上三角行列に分解できそうである。\par
+下三角行列の計算は簡単に済む。いま、添え字の$j_r$は$j_1 \leq j_2 \leq ... \leq j_k$を満たす。$L$は単位行列に$R1_{-c_1, i_1, j_1} ... R1_{-c_k, i_k, j_k}$を施したものと考えることもできるが、$s<t$なら$j_s \leq j_t < i_t$なので、$R1_{-c_s, i_s, j_s}$を施す時点で第$j_s$行には何も操作が施されていない。つまりこの時点の$j_s$行の対角成分は1だと分かる。また$j_s<i_s$なので$i_s$番目の値はゼロである。したがって、$R1_{-c_s, i_s, j_s}$を施すことは$(i_s, j_s)$成分に$-c_s$を書き込むことに等しい。\par
+ちなみに、ピボット選択ありのガウスの消去法のとき議論したことと同様に、上記の計算はピボット値がゼロとなるときに破綻する。R1処理のスカラー倍($c$)が無限に発散するためである。そのためLU分解は常に可能だとは限らない。\par
+以下はLU分解のpythonコード例である。関数\pythoninline{getR1}は行基本演算に関するものである。関数\pythoninline{LU}は行列を受け取り上三角行列と下三角行列(\pythoninline{L})を返す。ただし、この関数は元の行列\pythoninline{A}を上書きし、最終的に上三角行列にしているので、関数中に\pythoninline{U}のような変数は登場しない。関数\pythoninline{LU}はまず初めに行列の行数と列数を計算する。また、それとは別に行数と列数の低い方の値も計算する。ガウスの消去法コードのときは、暗黙的に正方行列を想定していた。工学で目にする連立一次方程式は劣決定でも有権者でもないためである。しかしながら、LU分解を正方行列以外に対して施すことも多いので、正方行列以外における配慮も必要となる。具体的には、$a_{ij}(i>j)$成分をゼロにする繰り返し計算をいつまで続けるか(つまり\pythoninline{l}回)を知っていなければならない。\par
+forjループで列毎のR1処理を行う。ただしピボット値がゼロの場合、計算が破綻するかもしれない。もしもピボット値がゼロであっても、その列$j$において$a_{ij}=0(i>j)$であるならば上三角行列の条件に反しないし、R1処理も不要である。逆に$a_{ij}=0(i>j)$を満たさない場合はLU分解が不可能な例である。このとき関数\pythoninline{LU}は\pythoninline{None}を返すようにした。\par
+\pythoninline{L}は最終的に下三角行列になる変数である。また、foriループではR1処理を繰り返し施している。このときのスカラー値\pythoninline{c}を\pythoninline{L}の適切な場所で上書きする。また最後から2番目の行で行列$A$にR1を施している。
+\begin{python}
+import numpy as np
+
+def getR1(n, a, j, i):
+	P = np.eye(n); P[i, j] += a
+	return P
+
+def LU(A):
+	m, n = A.shape; l = min(A.shape)
+	L = np.eye(m)
+	for j in range(l):
+		if A[j, j] == 0:
+			if not(np.all(A[j:, j] == 0)):
+				return None
+		else:
+			for i in range(j+1, m):
+				c = A[i, j]/A[j, j]
+				L[i, j] = c
+				A = getR1(m, -c, j, i)@A
+	return A, L
+
+A = np.array([
+	[1., 2., 3.],
+	[4., 5., 6.],
+	[7., 8., 9.]])
+U, L = LU(A)
+\end{python}\par
+連立一次方程式$A\bm x=\bm b$の$A$をLU分解し、$A=LU$を得たとする。このとき$U\bm x=\bm y$とすれば、もとの連立一次方程式は$L\bm y=\bm b$となる。これら2つの連立一次方程式の求解に要する演算量は非常に少ない。これは$U$と$L$が三角行列であるため、前進代入もしくは後退代入のみ演算すればよいためである。$\bm x$と$\bm y$が$n$次元である場合、求解に必要な演算量は$\mathcal{O}(n^2)$となり、確かにガウスの消去法より少ない。\par
+ただし、LU分解自体に$\mathcal{O}(n^3)$だけの演算量を要することは念頭に置いておかなければならない。そのため、連立一次方程式を計算するときにLU分解を施すことは一般的に無価値である。LU分解は、同じ係数行列$A$に対して様々な$\bm b$のときの解を求める場合に有効と言える。\par
+例えば異なる$\{\bm b_1, ..., \bm b_m \}$における解を計算するとしよう。このとき$m$個の解を求める訳だが、同じ$A$を使うため、LU分解は一回で済む。LU分解後に各$\bm b_i$の解を求めるのに必要な演算量は$\mathcal{O}(n^2)$であった。従ってLU分解の演算量が無視できるほど$m$の値が大きい場合、総演算量は$\mathcal{O}(mn^2)$となる。これは、同じ問題をガウスの消去法で解いた場合に要する演算量$\mathcal{O}(mn^3)$よりも少ない。
+\begin{itembox}[l]{補題}
+　$j$行の$c$倍を$i$行に加える行基本演算R1の行列を$R1(c, i, j)$と書く。また、$i$行と$j$行を交換する行基本演算R3の行列を$R3(i, j)$と書く。このとき、
+\begin{equation}
+R3(i, j)R1(c, k, l)=\left\{
+\begin{array}{ll}
+R1(c, k, l)R3(i, j) & (\{i, j\} \cap \{k, l\} = \emptyset) \\
+R1(c, j, l)R3(j, k) & (i=k, j \neq l) \\
+R1(c, k, j)R3(l, j) & (i=l, j \neq k) \\
+R1(c, l, k)R3(k, l)
+\end{array}\right. \notag
+\end{equation}
+が成立する。つまり、R1処理とR3処理の順番を変えても、同じ結果となる別の組み合わせは存在する。
+\end{itembox}
+\begin{itembox}[l]{命題}
+　任意の行列$A \in K^{m \times n}$に対して、$PA=LU$となる行列$P \in K^{m \times m}$と上三角行列$U \in K^{m \times n}$、下三角行列$L \in K^{m \times m}$が存在する。なお、このような分解をピボット選択付きLU分解と言う。
+\end{itembox}
+{\bf 証明：}明らかにR1処理とR3処理のみで$A$から上三角行列$U$を導出できる。また、前述の補題より、先にR3処理を施してから最後にR1処理を施しても上三角行列は導出できる。$j > i$の場合、$R1(c, i, j)^{-1}$は下三角行列となる。従って、R3処理を一つに纏めたものの行列を$P$、R1処理に関する下三角行列を$L$とすれば、$PA=LU$が得られる。\qed \par
+\begin{python}
+import numpy as np
+
+def getR1(n, a, j, i):
+	P = np.eye(n); P[i, j] += a
+	return P
+
+def getR3(n, i, j):
+	P = np.eye(n); 
+	P[i, i] = 0.; P[j, j] = 0.; P[i, j] = 1.; P[j, i] = 1.
+	return P
+
+def LUP(A):
+	m, n = A.shape; l = min(A.shape)
+	L = np.eye(m); P = np.eye(m)
+
+	for j in range(l):
+		if np.all(A[j:,j] == 0.) & (j == n):
+			return P, L, A
+		else:
+			maxidx = np.argmax(np.abs(A[j:,j])) + j
+			if maxidx != j:
+				A = getR3(m, j, maxidx)@A
+				P = getR3(m, j, maxidx)@P
+			
+			for i in range(j+1, m):
+				A = getR1(m, -A[i, j]/A[j, j], j, i)@A
+				L = getR1(m, A[i, j]/A[j, j], i, j)@L
+
+	return P, L, A
+\end{python}\par
+上にピボット選択付きLU分解のpythonコードを示す。forjループまではLU分解と似ていることが分かる。forjループ内では各列に対する処理が施される。まず、ピボット選択を行い、\pythoninline{getR3}で得た行列を\pythoninline{A}と\pythoninline{P}に左からかける。fori内ではR1処理を行うと同時に下三角行列の計算もする。R1処理の行列が\pythoninline{getR1(m, -A[i, j]/A[j, j], j, i)}のとき、その逆行列は\pythoninline{getR1(m, A[i, j]/A[j, j], i, j)}であり、それを左から順にかけていけば所望の下三角行列が得られる。
+
+\begin{itembox}[l]{補題}
+正定値行列$A$が$A=BB^\dagger$のように分解できたとする。このとき、$B$は正則である。
+\end{itembox}
+{\bf 証明：}$|A|=|B||B|^\dagger=|B|^2$であるが、正定値行列の行列式は正であるため、$|B| \neq 0$だと分かる。行列式がゼロでない行列は正則であるため、本命題は正しい。\qed
+\begin{itembox}[l]{命題}
+　正定値行列$A \in K^{n \times n}$は下三角行列$L$を用いて$A=LL^\dagger$のように分解できる。これをコレスキー分解と言う。
+\end{itembox}\par
+関係式より、$a_{ij}=\sum_{k=1}^j l_{ik}l_{jk}^*(i \geq j)$が得られる。$i=j$のとき、$a_{ii}=\sum_{k=1}^{i-1}l_{ik}l_{ik}^*+l_{ii}l_{ii}^*$であるため、
+\begin{equation}
+l_{ii}=\sqrt{a_{ii}-\sum_{k=1}^{i-1}l_{ik}l_{ik}^*} \notag
+\end{equation}
+と求まる。なお、行列$A$が正定値である場合、平方根の中身が正であることは保証されている(逆に正定値でなければ上式の計算で破綻する恐れがある)。また、$l_{ii}$が実数となる点にも注目したい。\par
+$i > j$の場合、$a_{ij}=\sum_{k=1}^{j-1} l_{ik}l_{jk}^*+l_{ij}l_{jj}^*$であり、$L$の対角成分は実数となることを思い出すと、
+\begin{equation}
+l_{ij}=\frac{a_{ij}-\sum_{k=1}^{j-1} l_{ik}l_{jk}^*}{l_{jj}} \notag
+\end{equation}
+と求まる。以下はコレスキー分解のpythonコードである。
+\begin{python}
+import numpy as np
+
+def Cholesky(A):
+	n = len(A)
+	L = np.zeros(A.shape).astype(complex)
+
+	for j in range(n):
+		a = sum([L[j, k]*L[j, k].conjugate() for k in range(j-1)])
+		L[j, j] = np.sqrt(A[j, j] - a)
+
+		if j < (n-1):
+			for i in range(j+1, n):
+				b = sum([L[i, k]*L[j, k].conjugate() for k in range(j-1)])
+				L[i, j] = (A[i, j] - b)/L[j, j]
+
+	return L
+\end{python}
+\begin{itembox}[l]{命題}
+　対称行列$A \in K^{n \times n}$が正定値もしくは負定値である場合、$A=LDL^\dagger$のように分解できる。ここで$L \in K^{n \times n}$は対角成分が全て1の下三角行列、$D \in K^{n \times n}$は対角行列である。なお、$A$が正定値もしくは負定値でなくても、$LDL^\dagger$で分解できることもある。このような分解を修正コレスキー分解と言う。
+\end{itembox}\par
+行列$A$が修正コレスキー分解可能な場合、各成分には$a_{ij}=\sum_{k=1}^jl_{ik}d_{kk}l_{jk}^*(i \geq j)$の関係がある。とくに$i=j$のとき$a_{ii}=\sum_{k=1}^{i-1}l_{ik}l_{ik}^*d_{kk}+l_{ii}l_{ii}^*d_{ii}$であり、$l_{ii}=1 \in \mathbb{R}$であるから、
+\begin{equation}
+d_{ii}=a_{ii}-\sum_{k=1}^{i-1}l_{ik}l_{ik}^*d_{kk} \notag
+\end{equation}
+だと分かる(ただし$d_{11}=a_{11}$とする)。$i>j$のとき$a_{ij}=\sum_{k=1}^{j-1}l_{ik}d_{kk}l_{jk}^*+l_{ij}d_{jj}$であるから、
+\begin{equation}
+l_{ij}=\frac{a_{ij}-\sum_{k=1}^{j-1}l_{ik}d_{kk}l_{jk}^*}{d_{jj}} \notag
+\end{equation}
+と求まる。$A$が定値である場合、$d_{ii} \neq 0$が保証されているため計算は破綻しない。以下は修正コレスキー分解のpythonコード例である。
+\begin{python}
+import numpy as np
+
+def modifiedcholesky(A):
+	n = len(A)
+	L = np.eye(A.shape).astype(complex)
+	D = np.zeros(A.shape); D[0, 0] = A[0, 0]
+
+	for i in range(1, n):
+		for j in range(i-1):
+			if j == 0:
+				L[i,j] = A[i,j]/D[j,j]
+			else:
+				L[i,j] = (A[i,j] - sum([L[i,k]*D[k,k]*L[j,k].conjugate()\
+							for k in range(j-1)]))/D[j,j]
+		D[i,i] = A[i,i] - sum([L[i,k]*L[i,k].conjugate()*D[k,k]for k in range(i-1)])
+
+	return L,D
+\end{python}
+\begin{tcolorbox}[title=定常反復法による連立一次方程式の求解]
+連立一次方程式$A\bm x=\bm b$に対して関数
+\begin{equation}
+f(\bm y):=M^{-1}N\bm y+M^{-1}\bm b \notag
+\end{equation}
+を考える。ここで$M$は何か正則行列で、$N=M-A$である。$\bm x$が連立一次方程式の解であるならば、$\bm x=f(\bm x)$を満たす。つまり、連立一次方程式の解は写像$f$の不動点であり、連立一次方程式の求解は不動点の探査と同意である。候補解$\bm x_k$に対して$\bm x_{k+1}=f(\bm x_k)$となるように解を更新する(ここで$k$は反復回数)。これを繰り返して解を求める。$f$は反復回数に依存しないため、これを定常反復法と呼ぶ。
+\end{tcolorbox}
+定常反復法の中で特に有名な手法として、ヤコビ法やガウスーザイデル法、SOR法がある。係数行列$A$に対して
+\begin{equation}
+\begin{array}{ll}
+L=(a_{ij}), & a_{ij}=0~{\rm for}~i \leq j \\
+D=(a_{ij}), & a_{ij}=0~{\rm for}~i \neq j \\
+U=(a_{ij}), & a_{ij}=0~{\rm for}~i \geq j \\
+\end{array} \notag
+\end{equation}
+なる下三角行列、対角行列、上三角行列を定義しよう(ここで$A=L+D+U$)。前述の3手法は$M$と$N$を$L$、$D$、$U$を用いて定義する。各種法の違いは具体的な定義の違いにある。
+\begin{tcolorbox}[title=ヤコビ法]
+　ヤコビ法では、候補解を
+\begin{equation}
+\bm x_{k+1}=-D^{-1}(L+U)\bm x_{k}+D^{-1}\bm b \notag
+\end{equation}
+に従い更新していく。別の書き方をすれば、$\bm x_{k+1}$の第$i$成分$x_{k+1}^i$を
+\begin{equation}
+x_{k+1}^i=\frac{1}{a_{ii}}\left( b_i-\sum_{j=1}^{i-1}a_{ij}x_k^j-\sum_{j=i+1}^n a_{ij}x_k^j \right) \notag
+\end{equation}
+に従い更新する。
+\end{tcolorbox}
+\begin{python}
+import numpy as np
+
+def Jacob(A, b, x = None, iteration = 10):
+	n = len(A)
+	if x is None:
+		x = np.zeros((n, 1))
+	D_inv = np.diag(1./np.diag(A))
+	U = np.triu(A, k = 1)
+	L = np.tril(A, k = -1)
+
+	for itr in range(iteration):
+		x = -D_inv@((L + U)@x) + D_inv@b
+
+	return x
+\end{python}
+\begin{tcolorbox}[title=ガウスーザイデル法]
+　ガウスーザイデル法では、候補解を
+\begin{equation}
+\bm x_{k+1}=-(D+L)^{-1}U\bm x_k+(D+L)^{-1}\bm b \notag
+\end{equation}
+に従い更新していく。別の書き方をすれば、$\bm x_{k+1}$の第$i$成分$x_{k+1}^i$を
+\begin{equation}
+x_{k+1}^i=\frac{1}{a_{ii}}\left( b_i-\sum_{j=1}^{i-1}a_{ij}x_{k+1}^j-\sum_{j=i+1}^n a_{ij}x_k^j \right) \notag
+\end{equation}
+に従い更新する。
+\end{tcolorbox}
+\begin{tcolorbox}[title=SOR法]
+　SOR法では、候補解を
+\begin{equation}
+\bm x_{k+1}=(D+\omega L)^{-1}\left\{ (1-\omega)D-\omega U \right\} \bm x_k+(D+\omega L)^{-1}\omega \bm b \notag
+\end{equation}
+に従い更新していく。ここで$\omega \in \mathbb{R}$はハイパーパラメータである。別の書き方をすれば、$\bm x_{k+1}$の第$i$成分$x_{k+1}^i$を
+\begin{equation}
+x_{k+1}^i=(1-\omega)x_k^i+\omega \hat x_{k+1}^i \notag
+\end{equation}
+\begin{equation}
+\hat x_{k+1}^i=\frac{1}{a_{ii}}\left( b_i-\sum_{j=1}^{i-1}a_{ij}x_{k+1}^j-\sum_{j=i+1}^n a_{ij}x_k^j \right) \notag
+\end{equation}
+に従い更新する。
+\end{tcolorbox}\par
+解が収束するための必要条件は$0 < \omega < 2$だと分かっている。ただしこれは十分条件でない。$\omega=1$のときSOR法はガウスーザイデル法と全く同じになる。$x_k^i$と$\hat x_{k+1}^i$の重み付き平均であるSOR法は、ガウスーザイデル法の候補解と反復回数$k$のときの解を基準に更新していると言える。そのため、$0 < \omega < 1$であるとき、$\omega$は緩和係数と見れるし、$1< \omega <2$のときはオーバーランの度合を示す係数と見れる。一般的に$\omega < 1$の値を採用することが多く、計算は小さな$\omega$ほど安定する。ただし小さすぎる$\omega$を設定した場合、解の収束に多数の反復計算を要し、結果的に計算時間が長くなる。
+
+\begin{tcolorbox}[title=スペクトル半径]
+　正方行列$A \in K^{n \times n}$の固有値を$\{ \lambda_1, ..., \lambda_n \}$とする。$\rho(A)={\rm max}_i\{ \lambda_i \}$のことをスペクトル半径と言う。
+\end{tcolorbox}
+\begin{itembox}[l]{命題}
+　定常反復法において$k$回目の候補解を$\bm x_k$とし、このときの残差を$\bm e_k=\bm x-\bm x_k$と書き表す。このとき、$||\bm e_{k+1}|| \leq ||M^{-1}N|| ||\bm e_k||$が成立する。
+\end{itembox}
+{\bf 証明：}式展開より
+\begin{equation}
+\bm e_{k+1}=\bm x-\bm x_{k}=(M^{-1}N\bm x+M^{-1}\bm b)-(M^{-1}N\bm x_k+M^{-1}\bm b)=M^{-1}N(\bm x-\bm x_{k})=M^{-1}N\bm e_k \notag
+\end{equation}
+が得られる。任意の行列とベクトルに対して$||A\bm u|| \leq ||A||||\bm u||$が成り立つので、本命題は正しい。\qed \par
+$M^{-1}N$は正則であるためスペクトル分解が可能である。そこで$M^{-1}N=\sum \lambda_i \bm u_i \bm u_i^{\rm T}$のように書き表したとき、定常反復法が収束するためには${\rm max}_i\{ \lambda_i \} < 1$、つまり$\rho(M^{-1}N)<1$でなければならない。
+
+\begin{tcolorbox}[title=Regular splitting]
+　実正則行列$A \in \mathbb{R}^{n \times n}$が$M^{-1} \geq 0$($M$の全ての要素がゼロ以上)と$N \geq 0$なる行列を用いて$A=M-N$のように分解できたとする。このような分解をRegular splittingと言う(和訳は知らない)。
+\end{tcolorbox}
+\begin{itembox}[l]{命題}
+　実正則行列$A$に対して$A=M-N$がregular splittingだとする。このとき、$\rho(M^{-1}N)<1$ならば$A^{-1} \geq 0$である。またその逆も然りである。
+\end{itembox}
+{\bf 証明：}$G=M^{-1}N$と書き表す。$\rho(G) <1$の場合、$A=M(I-G)$より
+\begin{equation}
+A^{-1}=(I-G)^{-1}M^{-1}=(I+G+G^2+...)M^{-1} \notag
+\end{equation}
+が得られる。$M^{-1} \geq 0$かつ$N \geq 0$であるため、$G \geq 0$である。従って$A^{-1} \geq 0$が成立する。この逆の証明は難しいので、本資料では省略する。\qed
+
+
+
+
+
+クリロフ部分空間の次元数は$A$や$\bm u$に依存するが、当然ながら${\rm dim}\mathcal{K}_n(A, \bm u) > N$は起こり得ない。また、${\rm dim}\mathcal{K}_n(A, \bm u) \leq n$である。$n$の増加に対し、クリロフ部分空間の次元数はある時点で増加を止める。つまり、${\rm dim}\mathcal{K}_m(A, \bm u) = {\rm dim}\mathcal{K}_{m+1}(A, \bm u)=m$となる$m$が存在する。この$m$をクリロフ部分空間の大きさと言う。
+\begin{itembox}[l]{命題}
+　$A\bm x=\bm b$($A \in K^{n\times n}$)なる連立一次方程式を考える。また、任意の候補解$\bm x_0$に対する残差を$\bm r_0=\bm b-A\bm x_0$と定義する。$A$と$\bm r_0$に関するクリロフ部分空間の大きさを$m$とする。このとき、連立一次方程式の解$\bm x$は$\{ \bm x_0, \bm r_0, A\bm r_0, ..., A^{m-1}\bm r_0 \}$の線形結合で書き表すことができる。
+\end{itembox}
+{\bf 証明：}クリロフ部分空間$\mathcal{K}_m(A, \bm r_0)$を考える。条件より、クリロフ部分空間は$\{ \bm r_0, ..., A^{m-1}\bm r_0\}$で張られている。従って$A^m\bm r_0$はこの基底の線形結合で書き表される。つまり、
+\begin{equation}
+A^m\bm r_0=c_0\bm r_0 + ..., c_{m-1}A^{m-1}\bm r_0 \notag
+\end{equation}
+を満たすスカラー$c_i \in K$が存在する。$A^{-1}\bm r_0=A^{-1}(\bm b-A\bm x_0)=\bm x-\bm x_0$であることを考えると、上式に左から$A^{-1}$を掛けることで
+\begin{equation}
+\bm x=\bm x_0+\frac{1}{c_0}\left(-c_1\bm r_0-c_2\bm r_0-...-c_{m-1}A^{m-2}\bm r_0+A^{m-1}\bm r_0\right) \notag
+\end{equation}
+が得られる。従って本命題は正しい。\qed \par
+連立一次方程式の数値解法の一分類であるクリロフ部分空間法は上記の性質を利用する。つまり、最初の候補解$\bm x_0 \in K^N$に対して$\bm x_n=\bm x_0+\bm z_n$のように解を更新していく。ここで$\bm z_n = (-c_1\bm r_0-c_2\bm r_0-...-c_{n-1}A^{n-2}\bm r_0+A^{n-1}\bm r_0)/c_0 \in \mathcal{K}_n(A, \bm r_0)$である。上記より、クリロフ部分空間の大きさ分だけ解を更新すれば厳密な解が得られる。また、適切な$\bm z_n$を$\mathcal{K}_n(A, \bm r_0)$の中から選
+ぶ事ができれば、少ない反復回数で良い近似解を安定的に得られる。\par
+しかしながら、$\bm z_n \in \mathcal{K}_n(A, \bm r_0)$しか制約がない今、$\bm z_n$を一意に選ぶ手立てがない。いま$n<m$とすれば${\rm dim}\mathcal{K}_n(A, \bm r_0)=n$なので、$n$個のスカラー値$(\{c_0, ..., c_{n-1}\})$を定めるための追加の制約が必要となる。この制約の与え方によってクリロフ部分空間法は更に分類される。以下に3つの例を紹介する。
+\begin{tcolorbox}[title=クリロフ部分空間法における制約]
+\begin{itemize}
+\item リッツ-ガラーキン法：$\bm r_n \perp \mathcal{K}_n(A, \bm r_0)$。
+\item ペトロフ-ガラーキン法：$\bm r_n \perp W_n,~~~{\rm dim}W_n=n$。
+\item 最小残差法：${\rm min}_{\bm x_n \in \bm x_0+\mathcal{K}_n(A, \bm r_0)} ||\bm b-A\bm x_n||$。
+\end{itemize}
+ここで$\bm r_n=\bm b-A\bm x_n=\bm r_0-A\bm z_n$である。
+\end{tcolorbox}\par
+リッツ-ガラーキン法は$W_n=\mathcal{K}_n(A, \bm r_0)$としたときのペトロフ-ガラーキン法に相当する。$\mathcal{K}_n(A, \bm r_0)$を張る$n$個の基底ベクトルと直交するという条件が追加された訳なので、$n$個のスカラー値$(\{c_0, ..., c_{n-1}\})$が一意に定まるようになった。また、ペトロフ-ガラーキン法についても同様である。
+\begin{itembox}[l]{命題}
+　最小残差法の制約は$W_n=A\mathcal{K}_n(A, \bm r_0)$としたときのペトロフ-ガラーキン法と同一視できる。ここで、\\$A\mathcal{K}_n(A, \bm r_0)={\rm span}(\{ A\bm v_1, ..., A\bm v_n \})$であり、$\{\bm v_1, ..., \bm v_n\}(\bm v_i \in K^N)$は$\mathcal{K}_n(A, \bm r_0)$の基底である。
+\end{itembox}
+{\bf 証明：}クリロフ部分空間の基底を用いて$V_n=(\bm v_1, ..., \bm v_n) \in K^{N \times n}$なる行列を定義する。このとき$\bm z_n \in \mathcal{K}_n(A, \bm r_0)$なので$\bm z_n=V_n\bm c_n$を満たすベクトル$\bm c_n \in K^n$が存在する。すると残差は$\bm r_n=\bm r_0-AV_n\bm c_n$と書き表される。$\bm r_n \perp A\mathcal{K}_n(A, \bm r_0)$ならば、$A \bm v_i \in \mathcal{K}_n(A, \bm r_0)$なので$\bm r_n \perp A\bm v_i$が成立する。従って$(AV_n)^\dagger \bm r_0=\bm 0$となる。$\bm r_n=\bm r_0-AV_n\bm c_n$なので、$(AV_n)^\dagger \bm r_0-(AV_n)^\dagger AV_n\bm c_n=\bm 0$より、
+\begin{equation}
+\bm c_n=\left[ (AV_n)^\dagger AV_n \right]^{-1}(AV_n)^\dagger \bm r_0 \notag
+\end{equation}
+のように求まる。\par
+一方で$||\bm b-A\bm x_n||$が最小となるように$\bm z_n$を定める場合を考える。
+\begin{equation}
+\begin{array}{l}
+||\bm b-A\bm x_n||^2=(\bm b-A\bm x_n)^\dagger (\bm b-A\bm x_n)=f(\bm x)+d \\
+f(\bm x_n)=(M^\dagger M \bm x_n-M^\dagger \bm r_0)^\dagger (M^\dagger M)^{-1}(M^\dagger M\bm x_n-M^\dagger \bm r_0) \\
+d = -\bm r_0^\dagger M(M^\dagger M)^{-1}M^\dagger \bm r_0+\bm r_0^\dagger \bm r_0 \\
+M = AV_n
+\end{array} \notag
+\end{equation}
+に関して、最小残差法は$f(\bm x)$の最小値探査問題だと分かる。この解は$\bm x_n=(M^\dagger M)^{-1}M^\dagger \bm r_0$であり、この場合の$\bm c_n$は上式と等しい。従って本命題は正しい。\qed
+
+\begin{tcolorbox}[title=グラム-シュミットの直交化法]
+　ベクトル空間$V \in K^N$の任意の基底$\{ \bm v_1, ..., \bm v_n \}$は、下記アルゴリズムにより正規直交基底$\{ \bm u_1, ..., \bm u_n \}$に変換できる。これをグラム-シュミットの直交化法と言う。
+\begin{enumerate}
+\item $\bm v_1$から$\bm u_1=\bm v_1/|| \bm v_1 ||$を得る。
+\item 帰納的に下記基底ベクトルを計算する。
+\begin{equation}
+\bm u_{k+1}=\frac{\bm v_{k+1}-\sum_{i=1}^k(\bm u_i \cdot \bm v_{k+1})\bm u_i}{|| \bm v_{k+1}-\sum_{i=1}^k(\bm u_i \cdot \bm v_{k+1})\bm u_i ||} \notag
+\end{equation}
+\end{enumerate}
+\end{tcolorbox}\par
+以下にpythonコードを示す。\pythoninline{V}は基底$\bm v_i$を纏めたリストであり、本関数の出力である正規直交基底はリスト\pythoninline{U}に纏める。初めに1つの単位ベクトルを\pythoninline{U}に入れてから、foriループで直交するベクトルを求めていく。foruループは上記アルゴリズム中$\sum_{i=1}^k$に相当し、既に求められた正規直交基底ベクトルの射影成分を取り除いている。
+\begin{python}
+import numpy as np
+
+def Gram_Schmidt(V):
+	U = [V[0]/np.linalg.norm(V[0])]
+
+	for i in range(1, len(V)):
+		u_new = V[i] - np.sum([np.dot(u, V[i])*u for u in U], axis = 0)
+		u_new /= np.linalg.norm(u_new)
+		U.append(u_new)
+
+	return U
+\end{python}\par
+確かにグラム-シュミットの直交化法は多くの問題で利用されているが、クリロフ部分空間では別の手法が採用されている。いま$A \in K^{N \times N}$と$\bm v \in K^N$に関するクリロフ部分空間を考える。この大きさを$n$とする。$n<m$のとき、$\mathcal{K}_n(A, \bm v)$の次元は$n$であり、$\{ \bm v, A\bm v, ..., A^{n-1}\bm v \}$は$\mathcal{K}_n(A, \bm v)$の基底である。実はこの基底からグラム-シュミット直交化法を用いて正規直交基底を得ようとすると、数値計算的に問題が生じやすい。\par
+いま$A$は正則なので$\sum \lambda_i \bm w_i \bm w_i^{\rm T}$の対角化可能である。$\lambda_I$の絶対値が全固有値の中で最も大きいとき、$A^n\bm v$は$n$の増加とともに$\bm w_I$成分しか持たなくなる。クリロフ部分空間法は一般的に数千回の反復計算を行うので、大きな$n$を扱うことが多い。すると、$A^{n-2}\bm v$と$A^{n-1}\bm v$はどちらもほとんど$\bm w_I$を向いていると考えられる。このような状態でグラム-シュミット直交化法のように射影成分を取り除こうとすると、一時的に新しいベクトルの大きさが小さくなり、正規化(アルゴリズム中\pythoninline{u_new/np.linalg.norm(u_new)})の計算で数値誤差や発散が生じる。\par
+そもそもクリロフ部分空間法ではペトロフ-ガラーキン法などにおいてベクトル空間の基底が欲しいだけであって、それが正規直交基底である必要はないと思うかもしれない。しかしながら、やはり$A^{n-2}\bm v$と$A^{n-1}\bm v$が同じような方向を向いている状態だと、$\bm z_n$の係数$\{ c_0, ..., c_{n-1}\}$が不安定になる。そのため、クリロフ部分空間法において正規直交化は欠かせない。\par
+クリロフ部分空間法のためにグラム-シュミット直交化法に代わる手法が数多く提案された。以下でそれを紹介していく。
+
+\begin{tcolorbox}[title=アーノルディの直交化法]
+　正方行列$A \in K^{n \times n}$とベクトル$\bm v_1$に関するクリロフ部分空間$\mathcal{K}_n(A, \bm v)$を考える。この正規直交基底は以下のアルゴリズムより求めることができる。
+\begin{enumerate}
+\item $\bm u_1=\bm v_1/|| \bm v_1 ||$。
+\item $k=2, ..., n$に対して、以下の要領で帰納的に基底ベクトルを求める。
+\begin{equation}
+\bm u_k=\frac{A\bm u_{k-1}-\sum_{i=1}^k(\bm u_i \cdot A\bm u_{k-1})\bm u_i}{A\bm u_{k-1}-\sum_{i=1}^k(\bm u_i \cdot A^i\bm u_{k-1})\bm u_i} \notag
+\end{equation}
+\end{enumerate}
+\end{tcolorbox}\par
+アーノルディ法は$A^i\bm v_1$の代わりに$A\bm u_{k-1}$を利用している点でグラム-シュミット直交化法と異なる。以下にpythonコードを示す。
+\begin{python}
+import numpy as np
+
+def Arnoldi(A, v, n):
+	U = [v/np.linalg.norm(v)]
+
+	for i in range(1, n):
+		u_new = A@U[-1]
+		u_new -= np.sum([np.dot(u_new, u)*u for u in U], axis = 0)
+		u_new /= np.linalg.norm(u_new)
+
+		U.append(u_new)
+
+	return U
+\end{python}\par
+上記アルゴリズムのうち、$A{\bm u_{k-1}}$の$\bm u_i$への射影成分$(\bm u_i \cdot A{\bm u_{k-1}})$を$h_{i, k-1}(i=1, ..., k-1)$、規格化定数($A\bm u_{k-1}-\sum_{i=1}^k(\bm u_i \cdot A^i\bm u_{k-1})\bm u_i$)を$h_{k, k-1}$と書き表す。これにより定められるヘッセンベルグ行列($h_{ij}=0(i>j+1)$)を$H_k$と書き表す。また、アーノルディ法により得られた基底ベクトルを纏めた行列を$U_k=(\bm u_1, ..., \bm u_k)$とする。このとき、アーノルディ法の逐次的処理は
+\begin{equation}
+AU_k=U_{k+1}H_{k+1, k}=U_kH_k+h_{k+1, k}\bm u_{n+1}\bm e_k^{\rm T} \notag
+\end{equation}
+と書き表すこともできる。$U_k^\dagger U_k=I$であることと、$\bm u_{k+1} \perp U_k$であることより、上式の両辺に左から$U_k^\dagger$を掛けることで、$H_k=U_k^\dagger AU_k$であることが分かる。もしも係数行列$A$がエルミート行列であるならば、$H_k^\dagger=(U_k^\dagger AU_k)^\dagger=H_k$、つまり$H_k$もエルミート行列であり、しかも幅が3の帯行列となる。従って$A$がエルミート行列の場合、このアルゴリズムの演算量を減らすことができる(ランチョス法)。
+
+
+
+
+
+\end{document}
+
+
+
+
+

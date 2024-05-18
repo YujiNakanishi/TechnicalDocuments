@@ -1,0 +1,224 @@
+\documentclass[dvipdfmx, 9pt, a4paper]{jsarticle}
+\usepackage[margin=15mm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{amsmath,  amssymb}
+\usepackage{type1cm}
+\usepackage{latexsym}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{ascmac}
+\usepackage{listings,jvlisting}
+\usepackage{tcolorbox}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{9}
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{9}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+\renewcommand{\baselinestretch}{0.78}
+\newcommand{\bm}[1]{{\mbox{\boldmath $#1$}}}
+\newcommand{\bnabla}{\bm \nabla}
+\newtheorem{Proof}{証明}
+\def\qed{\hfill $\Box$}
+
+\newcommand\pythonstyle{\lstset{
+language=Python,
+basicstyle=\ttm,
+morekeywords={self},
+keywordstyle=\ttb\color{deepblue},
+emph={MyClass,__init__},
+emphstyle=\ttb\color{deepred},
+stringstyle=\color{deepgreen},
+frame=tb,
+showstringspaces=false
+}}
+
+\lstnewenvironment{python}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+
+\newcommand\pythonexternal[2][]{{
+\pythonstyle
+\lstinputlisting[#1]{#2}}}
+\newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
+
+
+\begin{document}
+\begin{center}
+{\fontsize{18pt}{1pt}\selectfont Green関数}\\
+\end{center}
+\section*{はじめに}
+線形現象を考える場合、一瞬かつ局所の作用によって引き起こされた状態が分かれば、重ね合わせの原理により任意の作用によって生じる状態も分かることになる。本資料で扱うGreen関数は正に単位的な作用によって引き起こされた状態に関するもので、作用した時刻$t'$、作用した点$\bm r'$、並びに状態を観測する時刻$t$と位置$\bm r$の関数$G(\bm r, t, \bm r', t)$である(当然ながら静的な現象の場合は$G(\bm r, \bm r')$)。\par
+単位的な作用はDiracのデルタ関数で書き表される。例えば静電ポテンシャル$\phi$の支配方程式$\Delta \phi=-\rho/\epsilon$に対して、関連するGreen関数は$\Delta G=-\delta(\bm r-\bm r')$を満たす。つまり支配方程式中の源泉をデルタ関数に変えたものが、Green関数のための支配方程式となる。\par
+本資料ではHelmholtz方程式
+\begin{equation}
+(\Delta+k^2)\phi=-\rho
+\end{equation}
+と波動方程式のような動的な方程式
+\begin{equation}
+\left(\Delta -\frac{1}{c^2}\partial_{tt}-\frac{1}{k^2}\partial_t-\mu^2 \right)\phi=-\rho
+\end{equation}
+のGreen関数を考える。どちらの方程式も物理学において重要であり、多くの場面で目にする。\par
+両式のうち式(1)は静的な物理現象を扱っている。ただしHelmholtz方程式と言ったが、本資料の議論は$k$の値に依存しない。したがって本資料で得た結論はそのままPoisson方程式$\Delta \phi=-\rho$にも使える。\par
+式(2)は動的な物理現象を扱っている。また、式(1)のときと同様に、本資料の議論は係数の値に依存しないので、ここで得られた結果はそのまま波動方程式にも使える。
+
+\section{Helmholtz方程式におけるGreen関数}
+式(1)に対応するGreen関数は
+\begin{equation}
+(\Delta+k^2)G=-\delta(\bm r-\bm r')
+\end{equation}
+を満たす。ただし一般的な問題では支配方程式だけでなく境界条件も考えなければならない。そこで天下り的だが、$\phi$に関する境界条件の前に$G$のための境界条件として
+\begin{equation}
+A(\bm r)\bm n\cdot \bm \nabla G+B(\bm r)G=0
+\end{equation}
+を設定する。ここで$A$と$B$は既知の関数であり、両方が同時にゼロになることはない。また$\bm n$は境界面の外向き法線ベクトルである。
+\begin{tcolorbox}[title=命題1.1：相反定理]
+　Green関数は相反定理$G(\bm r, \bm r')=G(\bm r', \bm r)$を満たす。
+\end{tcolorbox}
+{\bf 証明：}式(3)の領域を$V$、境界を$S$とする。Greenの定理より
+\begin{equation}
+\int_S dS \bm n \cdot \left\{ G(\bm r, \bm r')\bnabla G(\bm r, \bm r'')-G(\bm r, \bm r'')\bnabla G(\bm r, \bm r') \right\}=\int_V d\bm r\left\{ G(\bm r, \bm r')\Delta G(\bm r, \bm r'')-G(\bm r, \bm r'')\Delta G(\bm r, \bm r') \right\} \notag
+\end{equation}
+が成り立つ。いま$\Delta G(\bm r, \bm r')=-\delta(\bm r-\bm r')$なので、上式は
+\begin{equation}
+\begin{array}{ll}
+\int_S dS \bm n \cdot \left\{ G(\bm r, \bm r')\bnabla G(\bm r, \bm r'')-G(\bm r, \bm r'')\bnabla G(\bm r, \bm r') \right\} & =-\int_V d\bm r\left\{ G(\bm r, \bm r')\delta(\bm r-\bm r'')-G(\bm r, \bm r'')\delta(\bm r-\bm r') \right\} \\
+ & = G(\bm r', \bm r'')-G(\bm r'', \bm r') 
+\end{array}
+\end{equation}
+と書き換えることができる。位置$\bm r \in V$において$A(\bm r) \neq 0$のとき、
+\begin{equation}
+\bm n \cdot G(\bm r, \bm r')\bnabla G(\bm r, \bm r'')-\bm n \cdot G(\bm r, \bm r'')\bnabla G(\bm r, \bm r')=-G(\bm r, \bm r')\frac{B}{A}G(\bm r, \bm r'')+-G(\bm r, \bm r'')\frac{B}{A}G(\bm r, \bm r')=0\notag
+\end{equation}
+が成立する。一方で位置$\bm r \in V$において$A=0$のとき、$B \neq$なので$G(\bm r, \bm r')=G(\bm r, \bm r'')=0$となる。結局任意の$\bm r \in V$において式(5)の左辺はゼロとなるため、$G(\bm r', \bm r'')=G(\bm r'', \bm r')$が成立する。\qed
+
+\begin{itembox}[l]{補題1.1}
+　式(1)を満たす$\phi$と式(3)を満たす$G$を考える。このとき、以下の等式が成立する。
+\begin{equation}
+\phi(\bm r)=\int_S dS' \bm n \cdot \left\{ G(\bm r, \bm r')\bnabla' \phi(\bm r')-\phi(\bm r')\bnabla'G(\bm r, \bm r') \right\}+\int_Vd\bm r'G(\bm r, \bm r')\rho(\bm r')
+\end{equation}
+ここで$\bnabla'$は$\bm r'$に関する勾配である。
+\end{itembox}
+{\bf 証明：}相反定理より、$(\Delta + k^2)G(\bm r', \bm r)=-\delta(\bm r-\bm r')$が成立する。またGreenの定理より
+\begin{equation}
+\begin{array}{ll}
+\int_S dS' \bm n \cdot \left\{ G(\bm r, \bm r')\bnabla' \phi(\bm r')-\phi(\bm r')\bnabla'G(\bm r, \bm r') \right\} &=\int_V d\bm r'\left\{ G(\bm r, \bm r')\Delta'\phi(\bm r')-\phi(\bm r')\Delta'G(\bm r, \bm r') \right\} \\
+ & = -\int_Vd\bm r'\left\{ G(\bm r, \bm r')\rho(\bm r')-\phi(\bm r')\delta(\bm r'-\bm r) \right\} \\
+ & = -\int_V d\bm r'G(\bm r, \bm r')\rho(\bm r')+\phi(\bm r)\theta(\bm r \in V)
+\end{array} \notag
+\end{equation}
+が成り立つ。ここで$\theta$は$\bm r \in V$のときに1となるヘビサイド関数である。よって本補題は確かに成り立つ。\qed \par
+補題1.1より、$\phi$と$G$の関係が得られた。式(1)より$\rho$は源泉であり、式(6)の第2項からGreen関数の重ね合わせで$\phi$を求める様子が伺える。また式(6)の第1項は境界条件の寄与である。\par
+しかしながら、実際に式(6)から$\phi$を求めることはできない。一般的に境界条件は位置$\bm r$の$\bnabla \phi$と$\phi$を同時に与えてはくれないためである。そのため第1項の計算ができない。そこで第1項を書き換えることを考える。\par
+いま$\phi$の境界条件として
+\begin{equation}
+A(\bm r)\bm n\cdot \bm \nabla \phi+B(\bm r)\phi=C(\bm r)
+\end{equation}
+が与えられているとしよう。ここで$A$と$B$はGreen関数のための境界条件(式(4))と全く同じであるとし、$C$は別の既知関数とする。$\bm r \in S$において$A \neq 0$のとき、式(6)の面積分は
+\begin{equation}
+\int_S dS' \frac{G(\bm r, \bm r')}{A(\bm r')} \left\{A(\bm r')\bm n \cdot \bnabla' \phi(\bm r')+B(\bm r')\phi(\bm r') \right\}=\int_S dS' G(\bm r, \bm r')\frac{C}{A} \notag
+\end{equation}
+と書き換えられる。一方で$A=0$の場合、式(6)の面積分は
+\begin{equation}
+-\int_S dS' \phi(\bm r')\bm n \cdot \bnabla' G(\bm r, \bm r')=-\int_S dS' \frac{C(\bm r')}{B(\bm r')}\bm n \cdot \bnabla' G(\bm r, \bm r') \notag
+\end{equation}
+と書き換えられる。これらを用いることで式(6)の第1項は$A$、$B$、$C$とGreen関数の値のみで求めることができ、晴れて$\phi$も求められる訳である。重要な事実は、Green関数における境界条件は式(3)であり、$C$に依存しないことである。つまり、$\phi$を求めるためのGreen関数は境界条件がDirichlet型なのかNeumann型なのか、もしくはどんなRobin境界条件なのかを知りたいだけで、具体的な$C$の値を必要としない。このことから、一度Green関数を求めてしまえば、様々な$C(\bm r)$における$\phi$の分布を、式(6)などより求められることも言える。
+
+\begin{tcolorbox}[title=Helmholtz方程式型のGreen関数]
+　式(1)と式(7)の境界条件における$\phi(\bm r)$を考える。また、式(3)と式(4)の境界条件を満たすGreen関数を$\bm G(\bm r, \bm r')$を考える。物理系の空間領域を$V$、境界を$S$とする。また、$S_A=\{ \bm r|\bm r \in S | A(\bm r)\neq 0 \}$と$S_{\bar A}=S-S_A$なる部分集合を定義する。このとき、$\phi$は以下の式より求まる。
+\begin{equation}
+\phi(\bm r)=\int_{S_A} dS' G(\bm r, \bm r')\frac{C(\bm r')}{A(\bm r')}+\int_{S_{\bar A}} dS' \frac{C(\bm r')}{B(\bm r')}\bm n \cdot \bnabla'G(\bm r, \bm r')+\int_Vd\bm r'G(\bm r, \bm r')\rho(\bm r')
+\end{equation}
+\end{tcolorbox}
+
+\section{動的な方程式におけるGreen関数}
+式(2)に対応するGreen関数は
+\begin{equation}
+\left(\Delta -\frac{1}{c^2}\partial_{tt}-\frac{1}{k^2}\partial_t-\mu^2 \right)G(\bm r, t, \bm r', t')=-\delta(\bm r-\bm r')\delta(t-t')
+\end{equation}
+を満たす。前章と大きく異なるのは、Green関数が遅延条件を満たす点である。物理学において、時刻$t'$に起こした作用は、その後の時刻にしか影響を及ぼさない。つまり、式(9)のGreen関数は
+\begin{equation}
+G(\bm r, t, \bm r', t')=0~~~(t < t')
+\end{equation}
+も満たす。\par
+ここからは前章のようにGreen関数と$\phi$の関係を議論していく。なお、それぞれの境界条件は式(4)(7)と同様だとする。
+
+\begin{tcolorbox}[title=命題2.1：相反定理]
+　Green関数は相反定理$G(\bm r, t, \bm r', t')=G(\bm r', -t', \bm r, -t)$を満たす。
+\end{tcolorbox}
+{\bf 証明：}式(9)より
+\begin{equation}
+\left(\Delta -\frac{1}{c^2}\partial_{tt}-\frac{1}{k^2}\partial_t-\mu^2 \right)G(\bm r, -t, \bm r'', -t'')=-\delta(\bm r-\bm r'')\delta(t-t'') \notag
+\end{equation}
+が成立する。上式に$G(\bm r, t, \bm r', t')$を掛けたものと、式(9)にG(\bm r, -t, \bm r'', -t'')を掛けたものの差分を計算し、$\bm r$と$t$について積分すれば
+\begin{equation}
+\begin{array}{rl}
+-G(\bm r', -t', \bm r'', -t'')+G(\bm r'', t'', \bm r', t')=&\int_{t_0}^{t_1}dt \int_Vd \bm r \left[G(\bm r, -t, \bm r'', -t'')\left(\Delta -\frac{1}{c^2}\partial_{tt}-\frac{1}{k^2}\partial_t-\mu^2 \right)G(\bm r, t, \bm r', t') \right. \\
+ &\left. -\left(\Delta -\frac{1}{c^2}\partial_{tt}+\frac{1}{k^2}\partial_t-\mu^2 \right)G(\bm r, -t, \bm r'', -t'')G(\bm r, t, \bm r', t') \right] \\ 
+=&\int_{t_0}^{t_1}dt\int_S dS\bm n \cdot \left[ G(\bm r, -t, \bm r'', -t'')\bnabla G(\bm r, t, \bm r', t')-\bnabla G(\bm r, -t, \bm r'', -t'')G(\bm r, t, \bm r', t') \right] \\
+ &-\frac{1}{c^2}\int_V d\bm r\left[ G(\bm r, -t,\bm r'', -t'')\partial_tG(\bm r, t, \bm r', t')-\partial_tG(\bm r, -t, \bm r'', -t'')G(\bm r, t, \bm r', t')\right]_{t=t_0}^{t=t_1} \\
+ & -\frac{1}{k^2}\int_V d\bm r\left[ G(\bm r, -t, \bm r'', -t'')G(\bm r, t, \bm r', t') \right]_{t=t_0}^{t=t_1}
+\end{array} \notag
+\end{equation}
+が得られる。ここで時間領域を$[t_0, t_1]$とした。右辺第1項は命題1.1のときと同様にゼロとなる。$t$と$t'$、そして$t''$が$[t_0, t_1]$に含まれることを考えると、遅延条件より右辺第2項と第3項もゼロになる。従って本命題は正しい。\qed
+\begin{itembox}[l]{補題2.1}
+　式(2)を満たす$\phi$と式(9)を満たす$G$を考える。このとき、以下の等式が成立する。
+\begin{equation}
+\begin{array}{ll}
+\phi(\bm r, t)=&\int_{t_0}^{t+0}dt' \int_SdS'\bm n \cdot \left\{ G(\bm r, t, \bm r', t')\bnabla' \phi(\bm r', t')-\phi(\bm r', t')\bnabla'G(\bm r, t, \bm r', t') \right\} \\
+ &+\int_{t_0}^{t+0}dt'\int_V d\bm r'G(\bm r, t, \bm r', t')\rho(\bm r', t') \\
+ &+\frac{1}{k^2}\int_V d\bm r'G(\bm r, t, \bm r', t_0)\phi(\bm r', t_0) \\
+ &+\frac{1}{c^2}\int_V d\bm r'\left\{ G(\bm r, t, \bm r', t')\partial_t\phi(\bm r', t_0)-\partial_{t'}G(\bm r, t, \bm r', t_0)\phi(\bm r, t_0) \right\}
+\end{array} \notag
+\end{equation}
+\end{itembox}\par
+証明は補題2.1と同様なので省略する。右辺第1項は境界条件の寄与を、第2項は源泉の寄与、第3項と第4項は初期条件の寄与を表している。このうち第1項に関して、境界で$\phi$とその勾配が同時に与えられることはない。したがって前章と同様に書き換える必要がある。式(7)より、$A \neq 0$の場合、右辺第1項の被積分関数は
+\begin{equation}
+\frac{G(\bm r, t, \bm r', t')}{A(\bm r')}\left\{ A(\bm r')\bm n \cdot \bnabla'\phi(\bm r', t')+B(\bm r')\phi(\bm r', t') \right\} \notag
+\end{equation}
+と書き換えられる。一方で$A=0$の場合は
+\begin{equation}
+-\phi(\bm r', t')\bm n \cdot \bnabla G(\bm r, t, \bm r', t') \notag
+\end{equation}
+と書き換えられる。以上より、下記の纏めの通り晴れて$\phi$を求めることができる。
+
+\begin{tcolorbox}[title=動的な方程式のためのGreen関数]
+　式(2)と式(7)の境界条件における$\phi(\bm r)$を考える。また、式(9)と式(4)の境界条件を満たすGreen関数を$\bm G(\bm r, \bm r')$を考える。物理系の空間領域を$V$、境界を$S$とする。また、$S_A=\{ \bm r|\bm r \in S | A(\bm r)\neq 0 \}$と$S_{\bar A}=S-S_A$なる部分集合を定義する。このとき、$\phi$は以下の式より求まる。
+\begin{equation}
+\begin{array}{ll}
+\phi(\bm r, t)=&\int_{t_0}^{t+0}dt' \int_{S_A}dS' \frac{G(\bm r, t, \bm r', t')}{A(\bm r')}\left\{ A(\bm r')\bm n \cdot \bnabla'\phi(\bm r', t')+B(\bm r')\phi(\bm r', t') \right\} \\
+ &-\int_{t_0}^{t+0}dt' \int_{S_{\bar A}}dS' \phi(\bm r', t')\bm n \cdot \bnabla G(\bm r, t, \bm r', t') \\
+ &+\int_{t_0}^{t+0}dt'\int_V d\bm r'G(\bm r, t, \bm r', t')\rho(\bm r', t') \\
+ &+\frac{1}{k^2}\int_V d\bm r'G(\bm r, t, \bm r', t_0)\phi(\bm r', t_0) \\
+ &+\frac{1}{c^2}\int_V d\bm r'\left\{ G(\bm r, t, \bm r', t')\partial_t\phi(\bm r', t_0)-\partial_{t'}G(\bm r, t, \bm r', t_0)\phi(\bm r, t_0) \right\}
+\end{array}
+\end{equation}
+\end{tcolorbox}
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
